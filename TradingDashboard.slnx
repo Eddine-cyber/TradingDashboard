@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TradingDashboard.Core/TradingDashboard.Core.csproj" />
+  <Project Path="TradingDashbord.Pricing/TradingDashbord.Pricing.csproj" />
+</Solution>
