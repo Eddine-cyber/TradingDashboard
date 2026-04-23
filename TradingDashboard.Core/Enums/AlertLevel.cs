@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TradingDashboard.Core.Enums
 {
-    public enum AlertLevels
+    public enum AlertLevel
     {
         Info = 0,
         Warning = 1,
@@ -14,7 +14,7 @@ namespace TradingDashboard.Core.Enums
 
     public static class AlertLevelsExtensions
     {
-        public static bool RequiresImmediateAction(this AlertLevels alert)
+        public static bool RequiresImmediateAction(this AlertLevel alert)
         {
             return (int)alert > 1;
         }
