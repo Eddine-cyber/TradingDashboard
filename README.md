@@ -8,7 +8,7 @@ Le projet couvre la valorisation d'options (Black-Scholes analytique et Monte Ca
 
 ## Architecture
 
-La solution est organisée en 8 projets selon les principes de la Clean Architecture. Les dépendances sont unidirectionnelles : aucune référence circulaire n'est tolérée.
+La solution est organisée en 8 projets selon les principes de la Clean Architecture. Les dépendances sont unidirectionnelles : aucune référence circulaire.
 
 | Projet                        | Type          | Responsabilité                                                  |
 |-------------------------------|---------------|-----------------------------------------------------------------|
@@ -68,12 +68,12 @@ La solution est organisée en 8 projets selon les principes de la Clean Architec
 ### Prérequis
 
 - .NET 8 SDK
-- Une clé API Alpha Vantage (gratuite sur [alphavantage.co](https://www.alphavantage.co))
+- Une clé API Alpha Vantage ([alphavantage.co](https://www.alphavantage.co))
 
 ### Configuration
 
 ```bash
-git clone https://github.com/TON_USERNAME/TradingDashboard.git
+git clone https://github.com/Eddine-cybe/TradingDashboard.git
 cd TradingDashboard
 ```
 
@@ -117,8 +117,3 @@ dotnet test
 
 Ces seuils sont configurables via l'objet `LimitConfiguration` injecté au démarrage.
 
----
-
-## Licence
-
-MIT
