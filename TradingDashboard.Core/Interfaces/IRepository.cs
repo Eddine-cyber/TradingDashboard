@@ -4,7 +4,14 @@ using System.Text;
 
 namespace TradingDashboard.Core.Interfaces
 {
-    internal interface IRepository
+    interface IRepository<T> where T : class
     {
+        Task<T?> Get(Guid Id);
+        Task<IEnumerable<T>> GetAll();
+        Task AddEntity(T entity);
+        Task Update(T entity);
+        Task Delete(Guid Id);
+        Task<bool> IsExisting(Guid Id);
+
     }
 }

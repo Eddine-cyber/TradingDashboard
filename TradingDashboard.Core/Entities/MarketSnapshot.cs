@@ -5,5 +5,5 @@ using System.Timers;
 
 namespace TradingDashboard.Core.Entities
 {
-    public record MarketSnapshot(string Ticker, decimal SpotPrice, double ImpliedVolatility, double RiskFreeRate, DateTimeOffset Timestamp, string Source);
+    public record struct MarketSnapshot(string Ticker, decimal SpotPrice, double ImpliedVolatility, double RiskFreeRate, DateTimeOffset Timestamp, string Source);
 }

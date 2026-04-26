@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "TradingDashboard.Core": {
+      "commandName": "Project"
+    },
+    "TradingDashbord.Tests": {
+      "commandName": "Project",
+      "workingDirectory": "C:\\Users\\SALAHEDDINE\\source\\repos\\TradingDashboard\\Tests"
+    }
+  }
+}

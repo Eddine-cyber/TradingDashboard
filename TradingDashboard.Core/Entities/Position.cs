@@ -18,8 +18,8 @@ namespace TradingDashboard.Core.Entities
         public DateTimeOffset LastUpdatedAt { get; set; }
 
 
-        public bool IsLong() => this.NetQuantity > 0;
-        public bool IsFlat() => this.NetQuantity == 0;
+        public bool IsLong => this.NetQuantity > 0;
+        public bool IsFlat => this.NetQuantity == 0;
 
         public void UpdateMarketValue(decimal newSpot)
         {

@@ -2,6 +2,7 @@
   <Folder Name="/Éléments de solution/">
     <File Path="README.md" />
   </Folder>
+  <Project Path="Tests/Tests.csproj" Id="727214f9-15fa-46aa-8902-e7ba33c330cc" />
   <Project Path="TradingDashboard.Core/TradingDashboard.Core.csproj" />
   <Project Path="TradingDashbord.Pricing/TradingDashbord.Pricing.csproj" />
 </Solution>
