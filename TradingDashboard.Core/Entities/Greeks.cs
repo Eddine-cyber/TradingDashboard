@@ -12,7 +12,7 @@ namespace TradingDashboard.Core.Entities
         private double _vega;
         private double _theta;
         private double _rho;
-        private DateTime _calculatedAt;
+        private DateTimeOffset _calculatedAt;
 
         public double Delta
         {
@@ -61,7 +61,7 @@ namespace TradingDashboard.Core.Entities
             }
         }
 
-        public DateTime CalculatedAt
+        public DateTimeOffset CalculatedAt
         {
             get => _calculatedAt;
             set { _calculatedAt = value; }

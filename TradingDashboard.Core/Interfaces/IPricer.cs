@@ -6,10 +6,10 @@ using TradingDashboard.Core.Enums;
 
 namespace TradingDashboard.Core.Interfaces
 {
-    interface IPricer<TResult>
+    public interface IPricer<TResult>
     {
-        Task<TResult> CalculatePrice(MarketSnapshot SnapShot);
-        Task<Greeks> CalculateGreeks(MarketSnapshot SnapShot);
+        Task<TResult> CalculatePrice(Instrument instrument, MarketSnapshot SnapShot);
+        Task<Greeks> CalculateGreeks(Instrument instrument, MarketSnapshot SnapShot);
         ProductType SupportedProduct { get; }
 
     }
