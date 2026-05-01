@@ -5,9 +5,9 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TradingDashbord.Pricing.BlackScholes
 {
-    public static class MathExtensions
+    internal static class MathExtensions
     {
-        public static unsafe double Erf(double x)
+        internal static unsafe double Erf(double x)
         {
             /*
             Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
@@ -159,22 +159,22 @@ namespace TradingDashbord.Pricing.BlackScholes
                 return r / x - 1.0;
         }
 
-        public static double NormalCDF(this double x)
+        internal static double NormalCDF(this double x)
         {
             return 0.5 * (1 + Erf(x / Math.Sqrt(2)));
         }
 
-        public static double NormalPDF(this double x)
+        internal static double NormalPDF(this double x)
         {
             return ((1/Math.Sqrt(2*Math.PI))*Math.Exp(-0.5*(x*x)));
         }
 
-        public static double d1(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
+        internal static double d1(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
         {
             return (Math.Log((double)(spot / strike)) + (RiskFreeRate + 0.5 * ImpliedVolatility * ImpliedVolatility) * YearsToMaturity) / (ImpliedVolatility * Math.Sqrt(YearsToMaturity));
         }
 
-        public static double d2(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
+        internal static double d2(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
         {
             return d1(spot, strike, RiskFreeRate, ImpliedVolatility, YearsToMaturity) - (0.5 * ImpliedVolatility * ImpliedVolatility * Math.Sqrt(YearsToMaturity));
         }

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TradingDashbord.Pricing.Greeks
+namespace TradingDashbord.Pricing
 {
-    internal interface IPricingStrategy
+    internal class UnsupportedProductTypeException
     {
     }
 }

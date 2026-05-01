@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 using TradingDashboard.Core.Enums;
-using Entities = TradingDashboard.Core.Entities;
+using TradingDashboard.Core.Entities;
 using TradingDashbord.Pricing.BlackScholes;
 
-namespace TradingDashbord.Pricing.Greeks
+namespace TradingDashbord.Pricing.Greek
 {
-    public static class GreeksCalculator
+    internal static class GreeksCalculator
     {
-        public static Entities.Greeks Compute(ProductType type, double spot, double strike, double rate, double vol, double maturityInYears)
+        internal static Greeks Compute(ProductType type, double spot, double strike, double rate, double vol, double maturityInYears)
         {
-            Entities.Greeks greek = new();
+            Greeks greek = new();
             double D1 = MathExtensions.d1((decimal)spot, (decimal)strike, rate, vol, maturityInYears);
 
             double DeltaCall = D1.NormalCDF();
