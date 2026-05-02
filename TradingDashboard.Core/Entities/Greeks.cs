@@ -14,59 +14,22 @@ namespace TradingDashboard.Core.Entities
         private double _rho;
         private DateTimeOffset _calculatedAt;
 
-        public double Delta
+        public Greeks(double delta, double gamma, double vega, double rho, double theta, DateTimeOffset calculatedAt)
         {
-            get => _delta;
-            set {
-                if (value > 1 || value < -1)
-                    throw new Exception("Delta must be between -1 and 1");
-                _delta = value;
-            }
+            Delta = delta;
+            Gamma = gamma;
+            Vega = vega;
+            Theta = theta;
+            Rho = rho;
+            Theta = theta;
+            CalculatedAt = calculatedAt;
         }
-
-        public double Gamma
-        {
-            get => _gamma;
-            set
-            {
-                if (value < 0)
-                    throw new Exception("Gamma must be positive");
-                _gamma = value;
-            }
-        }
-
-        public double Vega
-        {
-            get => _vega;
-            set
-            {
-                if (value < 0)
-                    throw new Exception("Vega must be positive");
-                _vega = value;
-            }
-        }
-        public double Rho { 
-            get => _rho;
-            set { _rho = value; } 
-        }
-
-        public double Theta
-        {
-            get => _theta;
-            set
-            {
-                if (value > 0)
-                    throw new Exception("Theta must be negative");
-                _theta = value;
-            }
-        }
-
-        public DateTimeOffset CalculatedAt
-        {
-            get => _calculatedAt;
-            set { _calculatedAt = value; }
-        }
-
+        public double Delta { get; set; }
+        public double Gamma { get; set; }
+        public double Vega { get; set; }
+        public double Theta { get; set; }
+        public double Rho { get; set; }
+        public DateTimeOffset CalculatedAt { get; set; }
         public bool IsValide()
         {
             return true;

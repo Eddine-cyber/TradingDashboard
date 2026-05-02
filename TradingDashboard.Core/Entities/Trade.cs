@@ -5,5 +5,5 @@ using System.Text;
 
 namespace TradingDashboard.Core.Entities
 {
-    public record Trade(Guid TradeId, Guid InstrumentId, decimal Notional, int Quantity, decimal TradePrice, DateTimeOffset TradeDate, string Desk, string Trader);
+    public record Trade(Guid TradeId, Guid InstrumentId, double Notional, int Quantity, double TradePrice, DateTimeOffset TradeDate, string Desk, string Trader);
 }

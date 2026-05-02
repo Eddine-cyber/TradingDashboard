@@ -169,14 +169,14 @@ namespace TradingDashbord.Pricing.BlackScholes
             return ((1/Math.Sqrt(2*Math.PI))*Math.Exp(-0.5*(x*x)));
         }
 
-        internal static double d1(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
+        internal static double d1(double spot, double strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
         {
-            return (Math.Log((double)(spot / strike)) + (RiskFreeRate + 0.5 * ImpliedVolatility * ImpliedVolatility) * YearsToMaturity) / (ImpliedVolatility * Math.Sqrt(YearsToMaturity));
+            return (Math.Log((spot / strike)) + (RiskFreeRate + 0.5 * ImpliedVolatility * ImpliedVolatility) * YearsToMaturity) / (ImpliedVolatility * Math.Sqrt(YearsToMaturity));
         }
 
-        internal static double d2(Decimal spot, Decimal strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
+        internal static double d2(double spot, double strike, double RiskFreeRate, double ImpliedVolatility, double YearsToMaturity)
         {
-            return d1(spot, strike, RiskFreeRate, ImpliedVolatility, YearsToMaturity) - (0.5 * ImpliedVolatility * ImpliedVolatility * Math.Sqrt(YearsToMaturity));
+            return d1(spot, strike, RiskFreeRate, ImpliedVolatility, YearsToMaturity) - ImpliedVolatility * Math.Sqrt(YearsToMaturity);
         }
 
 

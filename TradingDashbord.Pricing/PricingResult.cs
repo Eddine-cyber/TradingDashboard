@@ -1,19 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using Entities = TradingDashboard.Core.Entities;
+using TradingDashboard.Core.Entities;
 
 namespace TradingDashbord.Pricing
 {
     public record class PricingResult
     {
-        internal decimal TheoreticalPrice { get; }
-        internal Entities.Greeks Greeks { get; }
-        internal DateTimeOffset ComputedAt { get; }
-        internal string PricingMethod { get; }
-        internal double? ConfidenceInterval { get; }
+        public double TheoreticalPrice { get; }
+        public Greeks Greeks { get; }
+        public DateTimeOffset ComputedAt { get; }
+        public string PricingMethod { get; }
+        public double? ConfidenceInterval { get; }
 
-        internal PricingResult(decimal _theoreticalPrice, Entities.Greeks _greeks, string _pricingMethod, double? _confidenceInterval) {
+        public PricingResult(double _theoreticalPrice, Greeks _greeks, string _pricingMethod, double? _confidenceInterval) {
             TheoreticalPrice = _theoreticalPrice;
             Greeks = _greeks;
             ComputedAt = DateTimeOffset.UtcNow;

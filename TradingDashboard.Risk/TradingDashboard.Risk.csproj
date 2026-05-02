@@ -4,15 +4,11 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TradingDashboard.Core\TradingDashboard.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+    <ProjectReference Include="..\TradingDashbord.Pricing\TradingDashbord.Pricing.csproj" />
   </ItemGroup>
 
 </Project>
