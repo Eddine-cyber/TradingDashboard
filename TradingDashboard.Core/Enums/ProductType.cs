@@ -15,7 +15,15 @@ namespace TradingDashboard.Core.Enums
         [Description("futures contract")]
         Future,
         [Description("forward contract")]
-        Forward
+        Forward,
+        [Description("Asian Arithmetic Average Call Option")] 
+        AsianCall,
+        [Description("Asian Arithmetic Average Put Option")]
+        AsianPut,
+        [Description("Lookback Fixed Strike Call Option")]
+        LookbackCall,
+        [Description("Lookback Fixed Strike Put Option")]
+        LookbackPut
     }
 
     public static class ProductTypeExtensions
@@ -29,7 +37,17 @@ namespace TradingDashboard.Core.Enums
 
         public static bool IsOption(this ProductType t)
         {
-            return t == ProductType.Call || t == ProductType.Put;
+            return t != ProductType.Forward && t != ProductType.Future;
+        }
+
+        public static bool IsExotic(this ProductType t)
+        {
+            return t == ProductType.AsianCall || t == ProductType.AsianPut || t == ProductType.LookbackCall || t == ProductType.LookbackPut;
+        }
+
+        public static bool IsVanilla(this ProductType t)
+        {
+            return !t.IsExotic() && t.IsOption();
         }
     }
     

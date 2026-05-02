@@ -18,7 +18,7 @@ namespace TradingDashbord.Pricing.BlackScholes
 
         internal VanillaOptionPricer(ProductType supportedproduct)
         {
-            if (!supportedproduct.IsOption())
+            if (!supportedproduct.IsVanilla())
                 throw new Exception("ProductType must be Call or Put");
             _supportedproduct = supportedproduct;
         }
