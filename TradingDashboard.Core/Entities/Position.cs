@@ -21,7 +21,7 @@ namespace TradingDashboard.Core.Entities
         public bool IsLong => this.NetQuantity > 0;
         public bool IsFlat => this.NetQuantity == 0;
 
-        public void UpdateMarketValue(double newSpot)
+        public void UpdateMarketValue(double newSpot) // spot of instrument not of the underlying
         {
             CurrentMarketValue = NetQuantity * newSpot;
             UnrealizedPnL = CurrentMarketValue - NetQuantity*AverageEntryPrice;

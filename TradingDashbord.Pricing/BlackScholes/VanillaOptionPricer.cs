@@ -11,7 +11,7 @@ using Entities = TradingDashboard.Core.Entities;
 
 namespace TradingDashbord.Pricing.BlackScholes
 {
-    public class VanillaOptionPricer : IPricer<double>
+    public class VanillaOptionPricer : IPricer<PricingResult>
     {
         private ProductType _supportedproduct;
 
@@ -22,7 +22,7 @@ namespace TradingDashbord.Pricing.BlackScholes
             _supportedproduct = supportedproduct;
         }
         // MarketSnapshot(string Ticker, double SpotPrice, double ImpliedVolatility, double RiskFreeRate, DateTimeOffset Timestamp, string Source)
-        public Task<double> CalculatePrice(Instrument instrument, MarketSnapshot SnapShot)
+        public Task<double> CalculatePriceOnly(Instrument instrument, MarketSnapshot SnapShot)
         {
             if (! (this.SupportedProduct == instrument.ProductType))
                 throw new Exception("the instrument typed is not the one supported by the pricer");
@@ -32,6 +32,14 @@ namespace TradingDashbord.Pricing.BlackScholes
             double CallPrice = SnapShot.SpotPrice * D1.NormalCDF() - instrument.Strike.Value*Math.Exp(-SnapShot.RiskFreeRate * instrument.YearsToMaturity) * D2.NormalCDF();
             return (this.SupportedProduct == ProductType.Call) ? Task.FromResult(CallPrice) : Task.FromResult(CallPrice - SnapShot.SpotPrice + instrument.Strike.Value*Math.Exp(-SnapShot.RiskFreeRate* instrument.YearsToMaturity));
         }
+
+        public async Task<PricingResult> CalculatePrice(Instrument instrument, MarketSnapshot SnapShot)
+        {
+            double theoreticalPrice = await CalculatePriceOnly(instrument, SnapShot);
+            Greeks greeks = await CalculateGreeks(instrument, SnapShot);
+            return new PricingResult(theoreticalPrice, greeks, "BlackScholes", null);
+        }
+
         public Task<Greeks> CalculateGreeks(Instrument instrument, MarketSnapshot SnapShot)
         {
             return Task.FromResult(GreeksCalculator.Compute(instrument.ProductType, SnapShot.SpotPrice, instrument.Strike.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity));

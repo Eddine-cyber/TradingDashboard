@@ -18,9 +18,14 @@ namespace TradingDashbord.Pricing.Strategy
         public async Task<PricingResult> PriceAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
         {
             IPayoff payoff = PayoffFactory.Creat(instrument);
-            MonteCarloOptionPricer pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, _config);
+            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, _config);
             return await pricer.CalculatePrice(instrument, snapshot);
         }
-
+        public async Task<double> PriceOnlyAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
+        {
+            IPayoff payoff = PayoffFactory.Creat(instrument);
+            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, _config);
+            return await pricer.CalculatePriceOnly(instrument, snapshot);
+        }
     }
 }

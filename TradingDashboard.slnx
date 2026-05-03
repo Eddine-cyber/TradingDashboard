@@ -1,5 +1,8 @@
 <Solution>
   <Folder Name="/Éléments de solution/">
+    <File Path="../../../Desktop/TradingDashboard_Specs/UMLDiagram/Core.png" />
+    <File Path="../../../Desktop/TradingDashboard_Specs/UMLDiagram/Pricing.png" />
+    <File Path="../../../Desktop/TradingDashboard_Specs/UMLDiagram/Risk.png" />
     <File Path="README.md" />
   </Folder>
   <Project Path="Tests/Tests.csproj" Id="727214f9-15fa-46aa-8902-e7ba33c330cc" />

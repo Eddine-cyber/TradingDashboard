@@ -8,10 +8,6 @@ using TradingDashbord.Pricing.MonteCarlo;
 using TradingDashbord.Pricing.MonteCarlo.Payoffs;
 using TradingDashbord.Pricing.Strategy;
 using TradingDashbord.Pricing.BlackScholes;
-using Xunit;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Tests
 {
@@ -330,7 +326,7 @@ namespace Tests
         {
             var instrument = UnitTestPricing.CallInstrument();
             var pricer = new VanillaOptionPricer(ProductType.Call);
-            double price = await pricer.CalculatePrice(instrument, _snap);
+            double price = await pricer.CalculatePriceOnly(instrument, _snap);
             Assert.True(price > 0, $"Call price négatif : {price}");
         }
 
@@ -339,7 +335,7 @@ namespace Tests
         {
             var instrument = UnitTestPricing.PutInstrument();
             var pricer = new VanillaOptionPricer(ProductType.Put);
-            double price = await pricer.CalculatePrice(instrument, _snap);
+            double price = await pricer.CalculatePriceOnly(instrument, _snap);
             Assert.True(price > 0);
         }
 
@@ -358,8 +354,8 @@ namespace Tests
             // C - S + K*e^{-rT} = P
             var call_instr = UnitTestPricing.CallInstrument(strike: 100);
             var put_instr = UnitTestPricing.PutInstrument(strike: 100);
-            double C = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(call_instr, _snap);
-            double P = await new VanillaOptionPricer(ProductType.Put).CalculatePrice(put_instr, _snap);
+            double C = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(call_instr, _snap);
+            double P = await new VanillaOptionPricer(ProductType.Put).CalculatePriceOnly(put_instr, _snap);
             double T = call_instr.YearsToMaturity;
             double K = 100.0;
             double parity = C - _snap.SpotPrice + K * Math.Exp(-_snap.RiskFreeRate * T);
@@ -374,9 +370,9 @@ namespace Tests
             var atm = UnitTestPricing.CallInstrument(strike: 100);
             var itm = UnitTestPricing.CallInstrument(strike: 80);
             var pricer = new VanillaOptionPricer(ProductType.Call);
-            double pOTM = await pricer.CalculatePrice(otm, _snap);
-            double pATM = await pricer.CalculatePrice(atm, _snap);
-            double pITM = await pricer.CalculatePrice(itm, _snap);
+            double pOTM = await pricer.CalculatePriceOnly(otm, _snap);
+            double pATM = await pricer.CalculatePriceOnly(atm, _snap);
+            double pITM = await pricer.CalculatePriceOnly(itm, _snap);
             Assert.True(pOTM < pATM && pATM < pITM,
                 $"OTM={pOTM:F4}, ATM={pATM:F4}, ITM={pITM:F4}");
         }
@@ -388,8 +384,8 @@ namespace Tests
             var snapLowVol = new MarketSnapshot("T", 100, 0.10, 0.05, DateTimeOffset.UtcNow, "T");
             var snapHighVol = new MarketSnapshot("T", 100, 0.40, 0.05, DateTimeOffset.UtcNow, "T");
             var pricer = new VanillaOptionPricer(ProductType.Call);
-            double pLow = await pricer.CalculatePrice(instrument, snapLowVol);
-            double pHigh = await pricer.CalculatePrice(instrument, snapHighVol);
+            double pLow = await pricer.CalculatePriceOnly(instrument, snapLowVol);
+            double pHigh = await pricer.CalculatePriceOnly(instrument, snapHighVol);
             Assert.True(pHigh > pLow);
         }
 
@@ -549,7 +545,7 @@ namespace Tests
             var instr_v = UnitTestPricing.CallInstrument();
             var instr_a = UnitTestPricing.AsianCallInstrument(observationCount: 252);
 
-            double vanilla = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(instr_v, snap);
+            double vanilla = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(instr_v, snap);
 
             var pricer_a = new MonteCarloOptionPricer(
                 ProductType.AsianCall,
@@ -569,7 +565,7 @@ namespace Tests
             var instr_v = UnitTestPricing.CallInstrument(strike: 90);
             var instr_l = UnitTestPricing.LookbackCallInstrument(strike: 90);
 
-            double vanilla = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(instr_v, snap);
+            double vanilla = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(instr_v, snap);
 
             var pricer_l = new MonteCarloOptionPricer(
                 ProductType.LookbackCall,
@@ -587,7 +583,7 @@ namespace Tests
         {
             var snap = UnitTestPricing.DefaultSnapshot();
             var instr = UnitTestPricing.CallInstrument();
-            double bs = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(instr, snap);
+            double bs = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(instr, snap);
 
             // VanillaCallPayoff doit être implémenté si absent : max(S_T - K, 0)
             var pricer_mc = new MonteCarloOptionPricer(

@@ -26,8 +26,8 @@ namespace Tests
             // Black-Scholes
             var call_instr = UnitTestPricing.CallInstrument();
             var put_instr = UnitTestPricing.PutInstrument();
-            double call = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(call_instr, snap);
-            double put = await new VanillaOptionPricer(ProductType.Put).CalculatePrice(put_instr, snap);
+            double call = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(call_instr, snap);
+            double put = await new VanillaOptionPricer(ProductType.Put).CalculatePriceOnly(put_instr, snap);
             var call_greeks = await new VanillaOptionPricer(ProductType.Call).CalculateGreeks(call_instr, snap);
 
             _output.WriteLine("=== BLACK-SCHOLES ===");
@@ -60,7 +60,7 @@ namespace Tests
                 new MonteCarloConfig { NumberOfPaths = 50_000 }
             );
             var lb_result = await pricer_lb.CalculatePrice(lb_instr, snap);
-            double vanilla_90 = await new VanillaOptionPricer(ProductType.Call).CalculatePrice(
+            double vanilla_90 = await new VanillaOptionPricer(ProductType.Call).CalculatePriceOnly(
                 UnitTestPricing.CallInstrument(strike: 90), snap);
 
             _output.WriteLine("=== MONTE CARLO — LOOKBACK CALL (K=90) ===");

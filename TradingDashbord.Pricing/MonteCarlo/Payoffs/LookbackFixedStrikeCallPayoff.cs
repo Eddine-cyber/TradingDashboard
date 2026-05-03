@@ -16,7 +16,7 @@ namespace TradingDashbord.Pricing.MonteCarlo.Payoffs
         }
 
         public double Compute(double[] path)
-        {
+    {
             if (path.Length == 0)
                 throw new ArgumentException("Path should not be empty");
 

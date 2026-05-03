@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TradingDashboard.Risk.MonteCarlo
+namespace TradingDashboard.Risk.StressTesting
 {
-    internal class SimulationResult
+    internal class StressTestProgress
     {
     }
 }

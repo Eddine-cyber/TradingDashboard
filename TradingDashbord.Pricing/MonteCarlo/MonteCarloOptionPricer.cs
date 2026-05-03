@@ -26,6 +26,13 @@ namespace TradingDashbord.Pricing.MonteCarlo
                 throw new Exception("ProductType must be an option");
             _supportedproduct = supportedproduct;
         }
+
+        public async Task<double> CalculatePriceOnly(Instrument instrument, MarketSnapshot snapshot)
+        {
+            GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Steps);
+            double price = CalculatePriceOnly(simulator, instrument);
+            return price;
+        }
         public async Task<PricingResult> CalculatePrice(Instrument instrument, MarketSnapshot snapshot)
         {
             GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Steps);
@@ -113,7 +120,7 @@ namespace TradingDashbord.Pricing.MonteCarlo
             double[][] paths = simulator.SimulatePathsParallel(NumberOfPaths);
             double[] payoffs = new double[NumberOfPaths];
             for (int i = 0; i < NumberOfPaths; i++)
-            {
+    {
                 payoffs[i] = Payoff.Compute(paths[i]);
             }
             return payoffs;

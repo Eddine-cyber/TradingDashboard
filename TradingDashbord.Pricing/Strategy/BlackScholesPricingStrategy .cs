@@ -11,11 +11,13 @@ namespace TradingDashbord.Pricing.Strategy
     {
         public async Task<PricingResult> PriceAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
         {
-            IPricer<double> pricer = new VanillaOptionPricer(instrument.ProductType);
-            double theoreticalPrice = await pricer.CalculatePrice(instrument, snapshot);
-            Greeks greeks = await pricer.CalculateGreeks(instrument, snapshot);
-            PricingResult res  = new PricingResult(theoreticalPrice, greeks, "BlackScholes", null);
-            return res;
+            IPricer<PricingResult> pricer = new VanillaOptionPricer(instrument.ProductType);
+            return await pricer.CalculatePrice(instrument, snapshot);
+        }
+        public async Task<double> PriceOnlyAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
+        {
+            IPricer<PricingResult> pricer = new VanillaOptionPricer(instrument.ProductType);
+            return await pricer.CalculatePriceOnly(instrument, snapshot);
         }
 
     }

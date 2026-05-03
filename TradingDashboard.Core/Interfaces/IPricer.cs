@@ -9,6 +9,7 @@ namespace TradingDashboard.Core.Interfaces
     public interface IPricer<TResult>
     {
         public Task<TResult> CalculatePrice(Instrument instrument, MarketSnapshot SnapShot);
+        public Task<double> CalculatePriceOnly(Instrument instrument, MarketSnapshot SnapShot);
         public Task<Greeks> CalculateGreeks(Instrument instrument, MarketSnapshot SnapShot);
         public ProductType SupportedProduct { get; }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TradingDashboard.Core.Entities;
 using TradingDashboard.Core.Enums;
+using TradingDashbord.Pricing.MonteCarlo;
 
 namespace TradingDashbord.Pricing.Strategy
 {
@@ -10,10 +11,10 @@ namespace TradingDashbord.Pricing.Strategy
     {
         private BlackScholesPricingStrategy _bsStrategy;
         private MonteCarloPricingStrategy _mcStrategy;
-        public PricingEngine(BlackScholesPricingStrategy bs, MonteCarloPricingStrategy mc)
+        public PricingEngine(BlackScholesPricingStrategy bs = null, MonteCarloPricingStrategy mc = null, MonteCarloConfig config = null)
         {
-            _bsStrategy = bs;
-            _mcStrategy = mc;
+            _bsStrategy = bs ?? new BlackScholesPricingStrategy();
+            _mcStrategy = mc ?? new MonteCarloPricingStrategy(config);
         }
 
         private IPricingStrategy Resolve(Instrument instrument)
@@ -25,6 +26,10 @@ namespace TradingDashbord.Pricing.Strategy
         public Task<PricingResult> PriceAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
         {
             return Resolve(instrument).PriceAsync(instrument, snapshot, ct);
+        }
+        public Task<double> PriceOnlyAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
+        {
+            return Resolve(instrument).PriceOnlyAsync(instrument, snapshot, ct);
         }
         public async Task<IReadOnlyList<PricingResult>> PricePortfolioAsync(IReadOnlyList<Instrument> instruments, MarketSnapshot snapshot, CancellationToken ct = default)
         {
