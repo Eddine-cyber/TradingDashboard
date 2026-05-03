@@ -36,7 +36,7 @@ namespace TradingDashbord.Pricing.MonteCarlo.Payoffs
                 throw new Exception("ObservationCount cannot be more ot equale to pathLength");
             int n = (pathLength - 1) / ObservationCount;
             for (int i = 1; i <= observationCount; i++)
-            {
+    {
                 indices[i - 1] = n * i;
             }
             return indices;

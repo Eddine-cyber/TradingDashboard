@@ -113,7 +113,7 @@ namespace TradingDashbord.Pricing.MonteCarlo
             double[][] paths = simulator.SimulatePathsParallel(NumberOfPaths);
             double[] payoffs = new double[NumberOfPaths];
             for (int i = 0; i < NumberOfPaths; i++)
-            {
+    {
                 payoffs[i] = Payoff.Compute(paths[i]);
             }
             return payoffs;
