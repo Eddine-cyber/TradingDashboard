@@ -1,25 +1,25 @@
 # TradingDashboard
 
-Système de pricing et de gestion de risque pour un portefeuille d'options vanilles, développé en C# 12 / .NET 8.
+Système de pricing et de gestion de risque pour un portefeuille d'options vanilles/Exotiques et Future/Forward, développé en C# 12 / .NET 8.
 
-Le projet couvre la valorisation d'options (Black-Scholes analytique et Monte Carlo), le calcul des sensibilités (Greeks), le suivi du PnL en temps réel, la vérification de limites de risque, le stress testing par scénarios de choc, et l'export de rapports.
+Le projet couvre la valorisation d'options (Black-Scholes analytique et Monte Carlo), le calcul des sensibilités (Greeks), le suivi du PnL en temps réel, le calcule de la Var/CVar/TailLosses, la vérification de limites de risque, le stress testing par scénarios de choc.
 
 ---
 
 ## Architecture
 
-La solution est organisée en 8 projets selon les principes de la Clean Architecture. Les dépendances sont unidirectionnelles : aucune référence circulaire.
+La solution est organisée en 8 projets, les dépendances sont unidirectionnelles (aucune référence circulaire).
 
 | Projet                        | Type          | Responsabilité                                                  |
 |-------------------------------|---------------|-----------------------------------------------------------------|
-| TradingDashboard.Core         | Class Library | Entités, interfaces, enums. Aucune dépendance externe.          |
-| TradingDashboard.Pricing      | Class Library | Black-Scholes, Monte Carlo, Greeks, patterns Factory et Strategy. |
+| TradingDashboard.Core         | Class Library | Entités, interfaces, enums.                                     |
+| TradingDashboard.Pricing      | Class Library | Black-Scholes, Monte Carlo, Greeks, patterns Factory et Strategy|
 | TradingDashboard.Data         | Class Library | Entity Framework Core 8, migrations, pattern Repository.        |
 | TradingDashboard.MarketData   | Class Library | Client Alpha Vantage, cache mémoire, résilience Polly.          |
 | TradingDashboard.Risk         | Class Library | PnL Engine, LimitChecker, StressTestEngine, pattern Observer.   |
 | TradingDashboard.Reports      | Class Library | Export Excel via EPPlus, export PDF via QuestPDF.               |
 | TradingDashboard.Dashboard    | Console App   | Point d'entrée, injection de dépendances, affichage temps réel. |
-| TradingDashboard.Tests        | xUnit Project | Tests unitaires et d'intégration (couverture minimale : 70%).   |
+| TradingDashboard.Tests        | xUnit Project | Tests unitaires et d'intégration                                |
 
 ---
 
@@ -41,25 +41,26 @@ La solution est organisée en 8 projets selon les principes de la Clean Architec
 
 **Pricing**
 
-- Valorisation analytique Black-Scholes pour les calls et puts vanilles. Le prix du put est dérivé par parité Call-Put afin de garantir la cohérence par construction.
-- Moteur Monte Carlo parallélisé avec calcul de l'intervalle de confiance à 95%.
+- Valorisation analytique Black-Scholes pour les options vanilles.
+- Moteur Monte Carlo parallélisé avec calcul de l'intervalle de confiance pour les options Exotiques.
 - Calcul des Greeks analytiques : Delta, Gamma, Vega, Theta, Rho.
 
 **Gestion des données de marché**
 
 - Récupération des prix en temps réel via l'API Alpha Vantage.
 - Cache mémoire avec expiration configurable et rate limiter (token bucket).
-- Reconnexion automatique avec backoff exponentiel via Polly.
+- Reconnexion automatique.
 
 **PnL et Risk**
 
 - Calcul du PnL journalier, MTD et YTD par position et à l'échelle du portefeuille.
+- Calule de la Var, CVar, TailLosses pour un portefeuille de positions Multi-actifs.
 - Vérification en continu des limites de risque (perte journalière, Delta net, Vega net, taille de position).
-- Stress testing sur des scénarios de choc marché (spot, volatilité, scénarios combinés).
+- Stress testing sur des scénarios de choc marché.
 
 **Reporting**
 
-- Export des résultats PnL et stress test en fichier Excel et PDF.
+- Export des résultats en fichier Excel et PDF.
 
 ---
 
@@ -81,7 +82,7 @@ La clé API doit être renseignée via les User Secrets .NET pour ne pas être v
 
 ```bash
 cd TradingDashboard.Dashboard
-dotnet user-secrets set "AlphaVantage:ApiKey" "VOTRE_CLE"
+dotnet user-secrets set "AlphaVantage:ApiKey" "CLE_API"
 ```
 
 ### Base de données
@@ -104,16 +105,4 @@ dotnet run
 dotnet test
 ```
 
----
-
-## Limites de risque par défaut
-
-| Limite             | Seuil                    | Niveau d'alerte |
-|--------------------|--------------------------|-----------------|
-| Perte journalière  | < -50 000 EUR            | Critical        |
-| Delta net          | > 100 en valeur absolue  | Warning         |
-| Vega nette         | > 500 en valeur absolue  | Warning         |
-| Notionnel position | > 10 000 000 EUR         | Info            |
-
-Ces seuils sont configurables via l'objet `LimitConfiguration` injecté au démarrage.
 
