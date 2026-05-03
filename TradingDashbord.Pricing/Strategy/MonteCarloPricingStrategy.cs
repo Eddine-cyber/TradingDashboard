@@ -10,21 +10,21 @@ namespace TradingDashbord.Pricing.Strategy
 {
     public class MonteCarloPricingStrategy : IPricingStrategy
     {
-        private readonly MonteCarloConfig _config;
+        public MonteCarloConfig Config { get; set; }
         public MonteCarloPricingStrategy(MonteCarloConfig config = null)
         {
-            _config = config ?? new MonteCarloConfig();
+            Config = config ?? new MonteCarloConfig();
         }
         public async Task<PricingResult> PriceAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
         {
             IPayoff payoff = PayoffFactory.Creat(instrument);
-            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, _config);
+            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, Config);
             return await pricer.CalculatePrice(instrument, snapshot);
         }
         public async Task<double> PriceOnlyAsync(Instrument instrument, MarketSnapshot snapshot, CancellationToken ct = default)
         {
             IPayoff payoff = PayoffFactory.Creat(instrument);
-            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, _config);
+            IPricer<PricingResult> pricer = new MonteCarloOptionPricer(instrument.ProductType, payoff, Config);
             return await pricer.CalculatePriceOnly(instrument, snapshot);
         }
     }

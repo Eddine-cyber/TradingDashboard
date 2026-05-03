@@ -8,9 +8,9 @@ namespace TradingDashboard.Core.Entities
     public class Position
     {
         public Guid PositionId { get; init; }
-        public Instrument Instrument { get; set; }
-        public int NetQuantity { get; set; }
-        public double AverageEntryPrice { get; set; }
+        public Instrument Instrument { get; init; }
+        public int NetQuantity { get; init; }
+        public double AverageEntryPrice { get; init; }
         public double CurrentMarketValue { get; set; }
         public double UnrealizedPnL { get; set; }
         public double DailyPnL { get; set; }
@@ -25,6 +25,11 @@ namespace TradingDashboard.Core.Entities
         {
             CurrentMarketValue = NetQuantity * newSpot;
             UnrealizedPnL = CurrentMarketValue - NetQuantity*AverageEntryPrice;
+            LastUpdatedAt = DateTimeOffset.UtcNow;
+        }
+        public void UpdateGreeks(Greeks newGreeks)
+        {
+            LastGreeks = NetQuantity * newGreeks;
         }
     }
 

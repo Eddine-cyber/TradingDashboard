@@ -1,0 +1,2193 @@
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{comment}
+\usepackage[margin=2.2cm, top=2.8cm, bottom=2.8cm]{geometry}
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage[hidelinks]{hyperref}
+\usepackage{tcolorbox}
+\usepackage{parskip}
+\usepackage{mdframed}
+\usepackage{multicol}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{bm}
+\usepackage{tikz}
+\usetikzlibrary{positioning,shapes.geometric,arrows.meta,fit,backgrounds,calc,bending}
+
+\tcbuselibrary{skins, breakable}
+
+% --- Couleurs -------------------------------------------------------------------
+\definecolor{navy}{HTML}{0D2A4A}
+\definecolor{cblue}{HTML}{1A56A0}
+\definecolor{lightblue}{HTML}{D6E4F5}
+\definecolor{cred}{HTML}{C0392B}
+\definecolor{redbg}{HTML}{FAE5E3}
+\definecolor{cgray}{HTML}{555555}
+\definecolor{lightgray}{HTML}{F5F5F5}
+\definecolor{gold}{HTML}{9A7000}
+\definecolor{goldbg}{HTML}{FFFBEA}
+\definecolor{green}{HTML}{1A6B35}
+\definecolor{greenbg}{HTML}{E8F5EE}
+\definecolor{codeinline}{HTML}{2C3E80}
+\definecolor{riskgreen}{HTML}{1A6B35}
+\definecolor{purple}{HTML}{6A0DAD}
+\definecolor{purplebg}{HTML}{F3EAFE}
+
+% --- Titres ---------------------------------------------------------------------
+\titleformat{\section}{\Large\bfseries\color{navy}}{}{0em}{}[\color{cblue}\titlerule]
+\titleformat{\subsection}{\large\bfseries\color{cblue}}{}{0em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{cgray}}{}{0em}{}
+\titlespacing{\section}{0pt}{1.8em}{0.6em}
+\titlespacing{\subsection}{0pt}{1.2em}{0.4em}
+\titlespacing{\subsubsection}{0pt}{0.8em}{0.2em}
+
+% --- Inline code ----------------------------------------------------------------
+\newcommand{\cs}[1]{\texttt{\color{codeinline}#1}}
+
+% --- Boites ---------------------------------------------------------------------
+\tcbset{
+  constraint/.style={
+    breakable, colback=redbg, colframe=cred,
+    colbacktitle=cred, coltitle=white,
+    fonttitle=\bfseries\small,
+    title={Contraintes C\# -- NE PAS IGNORER},
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    boxrule=0.8pt, arc=3pt,
+  },
+  note/.style={
+    breakable, colback=goldbg, colframe=gold,
+    colbacktitle=gold, coltitle=white,
+    fonttitle=\bfseries\small,
+    title={Pourquoi c'est important},
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    boxrule=0.8pt, arc=3pt,
+  },
+  deliverable/.style={
+    breakable, colback=greenbg, colframe=green,
+    colbacktitle=green, coltitle=white,
+    fonttitle=\bfseries\small,
+    title={Crit\`ere de validation},
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    boxrule=0.8pt, arc=3pt,
+  },
+  math/.style={
+    breakable, colback=purplebg, colframe=purple,
+    colbacktitle=purple, coltitle=white,
+    fonttitle=\bfseries\small,
+    title={Mod\'elisation math\'ematique},
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    boxrule=0.8pt, arc=3pt,
+  },
+  todo/.style={
+    breakable, colback=lightgray, colframe=cgray,
+    colbacktitle=cgray, coltitle=white,
+    fonttitle=\bfseries\small,
+    title={TO BE CONTINUED -- impl\'ementation ult\'erieure},
+    left=8pt, right=8pt, top=6pt, bottom=6pt,
+    boxrule=0.8pt, arc=3pt,
+  },
+}
+
+% --- Header / Footer ------------------------------------------------------------
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{navy}\textbf{Trading Dashboard -- C\# .NET 8}}
+\fancyhead[R]{\small\color{cgray}\textit{Sp\'ecifications Techniques v2.0}}
+\fancyfoot[C]{\small\color{cgray}\thepage}
+\fancyfoot[R]{\small\color{cgray}\textit{open-source -- github.com}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+% Macros maths
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\mathrm{d}}
+
+% ============================================================
+\begin{document}
+
+% --- PAGE DE GARDE --------------------------------------------------------------
+\begin{titlepage}
+\centering
+\vspace*{2cm}
+{\huge\bfseries\color{navy} Trading Dashboard\par}
+
+\vspace{1.2cm}
+\noindent\rule{\textwidth}{1.5pt}
+\vspace{0.5cm}
+{\LARGE\bfseries\color{navy} Sp\'ecifications Techniques\par}
+\vspace{0.3cm}
+{\large\color{cgray} Guide d'impl\'ementation -- C\# .NET 8\par}
+\vspace{0.5cm}
+\noindent\rule{\textwidth}{1.5pt}
+
+
+
+\vspace{3cm}
+\begin{tabular}{ll}
+\toprule
+\textbf{Stack}    & C\# 12, .NET 8 LTS, Entity Framework Core 8 \\
+\textbf{Version}  & 2.0 -- 2026 \\
+\textbf{Modules}  & 8 projets \\
+\textbf{Tests}    & xUnit, Moq, FluentAssertions \\
+\midrule
+\textbf{Nouveaut\'es v2.0} & Architecture en couches path/payoff/MC \\
+& Produits : barrières, digitales, worst-of, variance swaps ...\\
+& Pricer: multi-devises/multi-actifs/multi-flux \\
+& Model: Heston, LV, LSV \\
+\bottomrule
+\end{tabular}
+\end{titlepage}
+
+% --- TABLE DES MATIERES ---------------------------------------------------------
+\tableofcontents
+\newpage
+
+% ============================================================
+\section{Vue d'ensemble du projet}
+% ============================================================
+
+\subsection{Objectif et p\'erim\`etre produits}
+
+\textbf{Trading Dashboard} est un syst\`eme de pricing et de gestion de risque en temps
+quasi-r\'eel, impl\'ement\'e en C\# .NET 8. Il couvre l'ensemble de la cha\^ine de valeur
+d'un portefeuille multi-actifs, multi-devises : valorisation, Greeks, PnL, limites
+de risque, stress testing et rapports.
+
+La version 2.0 \'etend consid\'erablement le p\'erim\`etre produits par rapport \`a la v1.2
+(vanilles et exotiques mono-actif). Toutes les nouvelles familles sont priceable sous
+Black-Scholes Monte Carlo dans un premier temps~; les mod\`eles \`a volatilit\'e stochastique
+(Heston, Local Vol, LSV) feront l'objet d'it\'erations ult\'erieures.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l X l}
+\toprule
+\textbf{Famille} & \textbf{Produits} & \textbf{Moteur v2.0} \\
+\midrule
+Vanilles mono-actif & Call, Put, Future, Forward & BS analytique \\
+Exotiques mono-actif & AsianCall/Put, LookbackCall/Put (fixe et flottant) & MC mono-actif \\
+Barrières mono-actif & Knock-In/Out (Up/Down), Double Barrier & MC mono-actif + BGK \\
+Digitales mono-actif & CashOrNothing, AssetOrNothing & MC mono-actif \\
+FX Options & FxCall, FxPut, FxAsian, FxBarrier & MC multi-devises \\
+Multi-actifs & BasketCall/Put, WorstOf, BestOf, Spread, Outperformance & MC multi-actifs \\
+Quanto & Quanto (actif \'etranger, paiement domestique) & MC multi-devises \\
+Variance / Volatilit\'e & VarianceSwap, VolatilitySwap & MC mono-actif \\
+Cliquets & Cliquet, Ratchet & MC mono-actif \\
+Structured (placeholder) & AutocallAthena, AutocallPhoenix, ReverseConvertible & \textit{To be continued} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tcolorbox}[note]
+\textbf{Principe fondamental du choix de mod\`ele.} La question n'est pas
+``formule ferm\'ee ou Monte Carlo ?'' mais ``le mod\`ele capture-t-il les risques
+d\'eterminants du prix de march\'e ?'' Sous Black-Scholes, les barrières ont une
+formule ferm\'ee (Rubinstein-Reiner) mais elle ignore le skew de volatilit\'e, qui
+est pr\'ecis\'ement maximal \`a hauteur de la barri\`ere. En prod, les barrières sont
+pric\'ees sous Local Volatility ou LSV calibr\'e \`a la surface compl\`ete. La version BS
+de ce projet constitue un pricer de r\'ef\'erence, non un pricer de march\'e.
+\end{tcolorbox}
+
+\subsection{Architecture en couches -- principe directeur}
+
+La version 2.0 repose sur \textbf{trois axes d'extension ind\'ependants} :
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item \textbf{Le mod\`ele} (BS, Heston, LV, LSV) -- d\'etermine comment on g\'en\`ere les
+        trajectoires. Extension point : \cs{IPathGenerator}.
+  \item \textbf{Le produit} (call, barri\`ere, basket, autocall) -- d\'etermine comment
+        on calcule le payoff. Extension point : \cs{IPayoff}.
+  \item \textbf{La technique MC} (brute force, pont brownien, variable de contr\^ole) --
+        d\'etermine comment on estime l'esp\'erance. Extension point : \cs{IVarianceReduction}.
+\end{enumerate}
+
+Ces trois axes ne se contaminent pas. Ajouter Heston ne modifie ni les payoffs ni
+le moteur MC. Ajouter un autocall ne modifie ni le simulateur ni le moteur.
+
+\textbf{Couches du module Pricing :}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Couche} & \textbf{Abstraction principale} & \textbf{R\^ole} \\
+\midrule
+1 -- March\'e & \cs{MarketEnvironment} & Toutes les donn\'ees de march\'e : spots, taux, FX, matrice de corr\'elation \\
+2 -- Paths & \cs{IPathGenerator} / \cs{SimulatedPaths} & G\'en\'eration de trajectoires, ind\'ependante du produit \\
+3 -- Payoffs & \cs{IPayoff} & Calcul du flux non actualis\'e depuis les trajectoires \\
+4 -- R\'eduction de variance & \cs{IVarianceReduction} & Pont brownien, variables de contr\^ole, antith\'etique \\
+5 -- Moteur MC & \cs{IMonteCarloEngine} & Estimation de l'esp\'erance, actualisation, IC \`a 95\% \\
+6 -- Portefeuille & \cs{PortfolioPricer} & Simulation conjointe de toutes les positions \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{Architecture de la solution (inchang\'ee)}
+
+La solution \texttt{TradingDashboard.sln} contient 8 projets. Graphe de d\'ependances
+identique \`a la v1.2 : les d\'ependances sont unidirectionnelles, aucune r\'ef\'erence
+circulaire.
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\ttfamily}l l X}
+\toprule
+\textbf{Projet} & \textbf{Type} & \textbf{Responsabilit\'e} \\
+\midrule
+.Core       & Class Library  & Entit\'es, interfaces, enums. Aucune d\'ependance externe. \\
+.Pricing    & Class Library  & BS analytique ; Monte Carlo en couches (IPathGenerator,
+                               IPayoff, IVarianceReduction, IMonteCarloEngine) ;
+                               PortfolioPricer ; Greeks ; Factory/Strategy. \\
+.Data       & Class Library  & Entity Framework Core, migrations, Repository. \\
+.MarketData & Class Library  & Alpha Vantage, cache, retry Polly. \\
+.Risk       & Class Library  & PnL Engine, LimitChecker, StressTest, VaR/CVaR
+                               avec simulation conjointe. \\
+.Reports    & Class Library  & Export Excel (EPPlus) et PDF (QuestPDF). \\
+.Dashboard  & Console App    & Point d'entr\'ee, DI, affichage temps r\'eel. \\
+.Tests      & xUnit Project  & Tests unitaires et d'int\'egration. \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection{S\'equence de d\'eveloppement v2.0}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Semaine} & \textbf{Module} & \textbf{Objectif} \\
+\midrule
+1   & .Core v2.0       & ProductType \'etendu, IPathGenerator, SimulatedPaths, IPayoff v2, IVarianceReduction \\
+2   & .Pricing -- Paths & GbmPathGenerator, MultiAssetGbmPathGenerator (Cholesky), MultiCurrencyGbmPathGenerator \\
+3   & .Pricing -- Payoffs mono-actif & Barrières (BGK), Digitales, Lookback flottant, VarianceSwap \\
+4   & .Pricing -- Payoffs multi-actifs & BasketPayoff, WorstOfPayoff, BestOfPayoff, SpreadPayoff \\
+5   & .Pricing -- Moteur MC & IMonteCarloEngine, variance reduction, PortfolioPricer \\
+6   & .Risk v2.0       & PortfolioSimulator conjoint, PnLEngine \\
+7   & .Risk -- Limites \& Stress & LimitChecker, StressTestEngine \\
+8   & .Reports + .Dashboard & Export, affichage, DI \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\newpage
+% ============================================================
+\section{Module Core v2.0 -- \texttt{TradingDashboard.Core}}
+% ============================================================
+
+\subsection{Enums}
+
+\subsubsection{\texttt{ProductType.cs} -- Version 2.0}
+
+L'enum couvre d\'esormais l'ensemble des familles de produits d\'ecrites en section 1.
+
+\textbf{Valeurs attendues (avec attribut \cs{[Description]} sur chacune) :}
+\begin{center}
+\begin{tabularx}{1.1\textwidth}{>{\ttfamily}l l l}
+\toprule
+\textbf{Valeur} & \textbf{Famille} & \textbf{Description m\'etier} \\
+\midrule
+Call/Put & Vanilla mono-actif & European Call / Put Option \\
+Future/Forward & Vanilla mono-actif & Futures / Forward Contract \\
+AsianCall/Put & Exotique mono-actif & Asian Arithmetic Average Call / Put \\
+LookbackCall/Put & Exotique mono-actif & Lookback Fixed Strike Call / Put \\
+FloatingLookbackCall/Put & Exotique mono-actif & Lookback Floating Strike Call / Put \\
+UpAndOutCall/Put & Barri\`ere knock-out & Up-and-Out / Down-and-Out Call / Put \\
+DownAndOutCall/Put & Barri\`ere knock-out & Down-and-Out Call / Put \\
+UpAndInCall/Put & Barri\`ere knock-in & Up-and-In Call / Put \\
+DownAndInCall/Put & Barri\`ere knock-in & Down-and-In Call / Put \\
+DoubleBarrierCall/Put & Double barri\`ere & Double Barrier Call / Put \\
+CashOrNothingCall/Put & Digitale & Cash-or-Nothing Call / Put \\
+AssetOrNothingCall/Put & Digitale & Asset-or-Nothing Call / Put \\
+FxCall/Put & FX Options & FX European Call / Put (Garman-Kohlhagen) \\
+FxAsianCall/Put & FX Exotique & FX Asian Arithmetic Average Call / Put \\
+FxBarrierCall/Put & FX Barri\`ere & FX Knock-Out Call / Put \\
+BasketCall/Put & Multi-actifs & Basket Call / Put (moyenne pond\'er\'ee) \\
+WorstOfCall/Put & Multi-actifs & Worst-of Call / Put (minimum des rendements) \\
+BestOfCall/Put & Multi-actifs & Best-of Call / Put (maximum des rendements) \\
+SpreadOption & Multi-actifs & Spread Option ($S^1 - S^2 - K$) \\
+Outperformance & Multi-actifs & Outperformance ($S^1 - S^2$, $K=0$) \\
+Quanto & Multi-devises & Quanto (actif \'etranger, paiement domestique) \\
+VarianceSwap & Variance / Vol & Variance Swap \\
+VolatilitySwap & Variance / Vol & Volatility Swap \\
+Cliquet & Cliquet & Cliquet (resetted-strike sum of returns) \\
+Ratchet & Cliquet & Ratchet (accumulated capped returns) \\
+AutocallAthena & Structured (placeholder) & Autocall Athena \\
+AutocallPhoenix & Structured (placeholder) & Autocall Phoenix \\
+ReverseConvertible & Structured (placeholder) & Reverse Convertible \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{M\'ethodes d'extension dans \cs{ProductTypeExtensions} :}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{IsVanilla()} : Call, Put uniquement.
+  \item \cs{IsExotic()} : toutes les familles mono-actif path-dependent (Asian, Lookback, Barrier, Digital, Variance, Cliquet).
+  \item \cs{IsOption()} : tout produit avec optionnalit\'e (hors Future, Forward).
+  \item \cs{IsFx()} : FxCall, FxPut, FxAsianCall, FxAsianPut, FxBarrierCall, FxBarrierPut, Quanto.
+  \item \cs{IsMultiAsset()} : Basket, WorstOf, BestOf, Spread, Outperformance.
+  \item \cs{IsBarrier()} : les 10 types barri\`eres (knock-in, knock-out, double).
+  \item \cs{IsDigital()} : CashOrNothing et AssetOrNothing.
+  \item \cs{IsStructured()} : AutocallAthena, AutocallPhoenix, ReverseConvertible.
+  \item \cs{RequiresMultipleUnderlyings()} : \cs{IsMultiAsset() || IsStructured()}.
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\cs{IsVanilla()}, \cs{IsExotic()}, \cs{IsFx()}, \cs{IsMultiAsset()} sont mutuellement
+exclusifs. Un switch exhaustif dans \cs{PricerFactory} doit couvrir tous les cas
+sans \cs{default} silencieux -- utiliser \cs{_ => throw new UnsupportedProductTypeException(type)}.
+\end{tcolorbox}
+
+\subsubsection{\texttt{AssetClass.cs}, \texttt{Currency.cs}, \texttt{AlertLevel.cs}}
+
+Inchang\'es par rapport \`a la v1.2. \cs{AssetClass} comporte \cs{Equity}, \cs{FX}, \cs{Rate}.
+
+\subsection{Entit\'es}
+
+\subsubsection{\texttt{MarketEnvironment.cs} -- Remplacement de MarketSnapshot}
+
+\cs{MarketEnvironment} est l'objet central de march\'e pass\'e \`a tous les composants
+du moteur de pricing v2.0.
+
+\textbf{Propri\'et\'es attendues :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{double DomesticRate} -- taux sans risque domestique $r^0$.
+  \item \cs{IReadOnlyDictionary<Currency, double> ForeignRates} -- $r^i$ par devise.
+  \item \cs{IReadOnlyDictionary<string, MarketSnapshot> Snapshots} -- snapshot par ticker.
+  \item \cs{IReadOnlyDictionary<(Currency, Currency), FxRate> FxRates} -- taux de change.
+  \item \cs{GlobalCorrelationMatrix Correlation} -- matrice de corr\'elation globale.
+  \item \cs{DateTimeOffset AsOf} -- horodatage de l'environnement.
+\end{itemize}
+
+\textbf{Factory m\'ethods (r\'etrocompatibilit\'e v1.2) :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{static MarketEnvironment FromSingleAsset(MarketSnapshot snap)} -- construit
+        un environnement mono-actif domestique, permettant aux anciens pricers
+        de continuer \`a fonctionner sans modification.
+  \item \cs{static MarketEnvironment FromSnapshots(IEnumerable<MarketSnapshot> snaps,}\\
+        \cs{double domesticRate, GlobalCorrelationMatrix corr)} -- construction multi-actifs.
+\end{itemize}
+
+\subsubsection{\texttt{GlobalCorrelationMatrix.cs}}
+
+\textbf{Structure :} matrice carr\'ee \cs{double[,]} de taille $N \times N$, o\`u $N = \sum n_i + \bar{n}$.
+L'ordonnancement des facteurs suit exactement la convention math\'ematique d\'efinie
+en section~3.1.
+
+\textbf{Propri\'et\'es :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{double[,] Rho} -- la matrice de corr\'elation.
+  \item \cs{AssetIndex[] AssetMapping} -- mapping index $\to$ (ticker, AssetClass, Currency).
+  \item \cs{double[,] CholeskyFactor} -- facteur $L$ tel que $LL^\top = \rho$, calcul\'e \`a la construction.
+\end{itemize}
+
+\textbf{M\'ethodes :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{void Validate()} -- v\'erifie sym\'etrie, 1 sur la diagonale, d\'efinie positive.
+  \item \cs{int IndexOf(string ticker, AssetClass cls)} -- r\'ecup\`ere l'index dans le vecteur global.
+  \item \cs{GlobalCorrelationMatrix Sub(int[] indices)} -- sous-matrice pour un sous-ensemble d'actifs.
+\end{itemize}
+
+\begin{tcolorbox}[note]
+La d\'ecomposition de Cholesky est calcul\'ee une seule fois \`a la construction. Elle est
+r\'eutilis\'ee par tous les g\'en\'erateurs de trajectoires qui partagent ce \cs{MarketEnvironment}.
+Si la matrice n'est pas d\'efinie positive (notamment \`a cause de corr\'elations incoh\'erentes),
+l'algorithme de Cholesky l\`eve une \cs{InvalidCorrelationMatrixException} imm\'ediatement
+plut\^ot qu'au moment de la simulation.
+\end{tcolorbox}
+
+\subsubsection{\texttt{SimulatedPaths.cs} -- Objet de sortie des g\'en\'erateurs}
+
+\cs{SimulatedPaths} est le type de retour de tous les \cs{IPathGenerator}. C'est le
+seul objet qui circule entre le g\'en\'erateur et les payoffs.
+
+\textbf{Structure :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{double[,,] Paths} -- tenseur de taille \cs{[nFactors, nPaths, nSteps+1]}.
+        La dimension 0 correspond aux facteurs (actifs + taux FX), la dimension 1
+        aux sc\'enarios, la dimension 2 au temps discr\'etis\'e ($S_0$ en index 0).
+  \item \cs{AssetIndex[] AssetMapping} -- identifie chaque tranche de la dimension 0
+        par son ticker, sa classe et sa devise.
+  \item \cs{int NFactors, NPaths, NSteps} -- dimensions du tenseur.
+\end{itemize}
+
+\textbf{M\'ethodes :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{SimulatedPaths Extract(int[] factorIndices)} -- retourne un sous-tenseur
+        avec uniquement les facteurs demand\'es. Utilis\'e par les payoffs mono-actif
+        pour extraire leur tranche depuis une simulation conjointe de portefeuille.
+  \item \cs{SimulatedPaths Extract(string[] tickers)} -- variante par nom de ticker.
+  \item \cs{double[] GetPathForFactor(int factorIndex, int pathIndex)} -- acc\`es \`a une
+        trajectoire individuelle.
+  \item \cs{double[] GetTerminalValues(int factorIndex)} -- vecteur des spots terminaux
+        $S_T^{(j)}$ pour tous les sc\'enarios. Utilis\'e par les payoffs europ\'eens purs.
+\end{itemize}
+
+\begin{tcolorbox}[note]
+Le mapping \cs{AssetIndex[]} est fondamental. Il permet \`a un payoff basket de savoir
+que la dimension 0 correspond au CAC40 et la dimension 1 au Nikkei, ind\'ependamment
+de l'ordre dans lequel le simulateur a construit la matrice de corr\'elation.
+Le portefeuille pricer (section 5.6) exploite ce m\'ecanisme pour distribuer les paths.
+\end{tcolorbox}
+
+\subsubsection{Instruments multi-actifs (inchang\'es de v1.2)}
+
+\cs{BasketInstrument}, \cs{FxOptionInstrument}, \cs{QuantoInstrument},
+\cs{FixingSchedule} : inchang\'es. Se reporter au walkthrough v1.2.
+
+\subsection{Nouvelles interfaces}
+
+\subsubsection{\texttt{IPathGenerator.cs}}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{SimulatedPaths Generate(MarketEnvironment env, SimulationParameters params)} \\
+        M\'ethode principale. Prend l'environnement de march\'e complet et les param\`etres
+        de simulation, retourne le tenseur de trajectoires.
+  \item \cs{int NFactors \{ get; \}} -- nombre de facteurs stochastiques g\'en\'er\'es.
+  \item \cs{AssetIndex[] FactorMapping \{ get; \}} -- mapping des facteurs.
+\end{itemize}
+
+\subsubsection{\texttt{IPayoff.cs} -- Version 2.0}
+
+L'interface \cs{IPayoff} est mise \`a jour pour prendre \cs{SimulatedPaths} en entr\'ee
+(au lieu d'un \cs{double[]} mono-trajectoire).
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{double[] Compute(SimulatedPaths paths)} -- retourne un vecteur de payoffs
+        non actualis\'es, un par sc\'enario. La vectorisation est native.
+  \item \cs{string[] RequiredAssets \{ get; \}} -- tickers des actifs n\'ecessaires.
+        Utilis\'e par le \cs{PortfolioPricer} pour construire la simulation conjointe.
+  \item \cs{string Name \{ get; \}} -- lib\'ell\'e du produit.
+\end{itemize}
+
+\begin{tcolorbox}[note]
+Le passage de \cs{double[]} \`a \cs{SimulatedPaths} est la rupture architecturale
+principale entre v1.2 et v2.0. Les payoffs mono-actif s'adaptent trivalement :
+ils appellent \cs{paths.Extract(RequiredAssets)} puis it\`erent sur les trajectoires.
+Cette abstraction permet au \cs{PortfolioPricer} de passer une simulation conjointe
+compl\`ete et \`a chaque payoff d'en extraire sa tranche.
+\end{tcolorbox}
+
+\subsubsection{\texttt{IVarianceReduction.cs}}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{SimulatedPaths Apply(SimulatedPaths rawPaths, MarketEnvironment env)} \\
+        Transforme ou enrichit les trajectoires brutes.
+  \item \cs{string Name \{ get; \}}
+\end{itemize}
+
+\subsubsection{\texttt{IMonteCarloEngine.cs}}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{Task<PricingResult> PriceAsync(IPathGenerator gen, IPayoff payoff,}\\
+        \cs{MarketEnvironment env, SimulationParameters sim, CancellationToken ct)}
+  \item \cs{Task<Greeks> ComputeGreeksAsync(IPathGenerator gen, IPayoff payoff,}\\
+        \cs{MarketEnvironment env, SimulationParameters sim, CancellationToken ct)}
+\end{itemize}
+
+\subsubsection{\texttt{SimulationParameters.cs} -- Value object}
+
+Record immuable portant les param\`etres de simulation :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{int NumberOfPaths} (d\'efaut : 100\,000)
+  \item \cs{int Steps} (d\'efaut : 252)
+  \item \cs{double MaturityInYears}
+  \item \cs{int? Seed} -- nullable pour reproductibilit\'e
+\end{itemize}
+
+\subsection{Interfaces inchang\'ees de v1.2}
+
+\cs{IRepository<T>}, \cs{IPricer<TResult>}, \cs{IMarketDataFeed}, \cs{IRiskEngine},
+\cs{IMultiAssetPricer<TResult>} : inchang\'ees.
+
+\begin{tcolorbox}[deliverable]
+Core v2.0 est termin\'e quand :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{ProductType} compile avec tous les nouveaux membres et m\'ethodes d'extension coh\'erentes.
+  \item \cs{GlobalCorrelationMatrix} l\`eve \cs{InvalidCorrelationMatrixException} sur une matrice
+        non d\'efinie positive d\`es la construction.
+  \item \cs{SimulatedPaths.Extract(string[])} retourne le bon sous-tenseur pour un panier de 3 actifs.
+  \item \cs{MarketEnvironment.FromSingleAsset} permet aux tests v1.2 de compiler sans modification.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+% ============================================================
+\section{Cadre math\'ematique -- March\'e Multi-Devises sous Black-Scholes}
+% ============================================================
+
+\subsection{Description du march\'e}
+
+On consid\`ere un march\'e international compos\'e de $1$ devise domestique et $\bar{n}$
+devises \'etrang\`eres. On note $r^0$ le taux d'int\'er\^et domestique et $r^i$ le taux
+d'int\'er\^et de la devise \'etrang\`ere $i \in \{1, \dots, \bar{n}\}$.
+
+Le march\'e contient :
+\begin{itemize}[leftmargin=1.5em]
+  \item $n_0$ actifs risqu\'es domestiques $\bigl(S^{0,1}, \dots, S^{0,n_0}\bigr)$.
+  \item Pour chaque devise $i$ : le taux de change $X^i$ (unit\'es de devise domestique
+        pour une unit\'e de devise $i$) et $n_i$ actifs risqu\'es \'etrangers
+        $\bigl(S^{i,1}, \dots, S^{i,n_i}\bigr)$.
+\end{itemize}
+
+Le nombre total de facteurs stochastiques est $N = \displaystyle\sum_{i=0}^{\bar{n}} n_i + \bar{n}$.
+
+\subsection{Dynamiques sous la probabilit\'e historique $\mathbb{P}$}
+
+\begin{align}
+  \dd S^{0,\ell}_t &= S^{0,\ell}_t \bigl(\mu^{0,\ell}\,\dd t + \sigma^{0,\ell}\,\dd W^{0,\ell}_t\bigr),
+  \quad \ell \in \{1,\dots,n_0\} \\
+  \dd S^{i,\ell}_t &= S^{i,\ell}_t \bigl(\mu^{i,\ell}\,\dd t + \sigma^{i,\ell}\,\dd W^{i,\ell}_t\bigr),
+  \quad i \in \{1,\dots,\bar{n}\},\; \ell \in \{1,\dots,n_i\} \\
+  \dd X^i_t &= X^i_t \bigl(\mu^{i,X}\,\dd t + \sigma^{i,X}\,\dd W^{i,X}_t\bigr),
+  \quad i \in \{1,\dots,\bar{n}\}
+\end{align}
+
+o\`u tous les mouvements browniens sont r\'eels et corr\'el\'es. La matrice de corr\'elation
+$\rho \in \mathcal{M}_N(\mathbb{R})$ correspond au vecteur d'actifs $(\bar{S}, \bar{X})$
+ordonn\'e comme suit :
+
+\begin{enumerate}[leftmargin=1.5em]
+  \item Les $n_0$ actifs risqu\'es domestiques.
+  \item Pour $i \in \{1, \dots, \bar{n}\}$, les $n_i$ actifs risqu\'es dans la devise $i$.
+  \item Pour $i \in \{1, \dots, \bar{n}\}$, le taux de change $X^i$.
+\end{enumerate}
+
+\textbf{Cet ordonnancement est la convention de \cs{GlobalCorrelationMatrix} et doit
+\^etre respect\'e strictement par tous les g\'en\'erateurs de trajectoires.}
+
+\subsection{Dynamiques sous la mesure risque-neutre domestique $\mathbb{Q}^0$}
+
+Par le th\'eor\`eme de Girsanov et la condition d'absence d'arbitrage (parit\'e couverte
+des taux d'int\'er\^et pour les FX), sous $\mathbb{Q}^0$ :
+
+\begin{align}
+  \dd S^{0,\ell}_t &= S^{0,\ell}_t \Bigl(r^0\,\dd t + \sigma^{0,\ell}\,\dd \widetilde{W}^{0,\ell}_t\Bigr)
+  \label{eq:dom_asset} \\
+  \dd X^i_t &= X^i_t \Bigl(\bigl(r^0 - r^i\bigr)\dd t + \sigma^{i,X}\,\dd \widetilde{W}^{i,X}_t\Bigr)
+  \label{eq:fx_rate} \\
+  \dd S^{i,\ell}_t &= S^{i,\ell}_t \Bigl(\bigl(r^i - \rho_{i\ell,\,iX}\,\sigma^{i,\ell}\,\sigma^{i,X}\bigr)
+  \dd t + \sigma^{i,\ell}\,\dd \widetilde{W}^{i,\ell}_t\Bigr)
+  \label{eq:foreign_asset}
+\end{align}
+
+o\`u $\rho_{i\ell,\,iX} = \text{Corr}(W^{i,\ell}, W^{i,X})$ est la corr\'elation entre
+l'actif \'etranger $S^{i,\ell}$ et son taux de change $X^i$.
+
+\begin{tcolorbox}[math]
+\textbf{Ajustement quanto.} Le terme $-\rho_{i\ell,\,iX}\,\sigma^{i,\ell}\,\sigma^{i,X}$
+dans la d\'erive de $S^{i,\ell}$ est l'ajustement quanto. Il compense le fait que, sous
+$\mathbb{Q}^0$, un actif \'etranger pay\'e en devise domestique voit sa d\'erive modifi\'ee
+par la corr\'elation entre le rendement de l'actif et le rendement du change. Si
+$\rho_{i\ell,\,iX} > 0$ (actif et change corr\'el\'es positivement), la d\'erive est r\'eduite.
+Pour une option quanto pure ($X^i$ fix\'e contractuellement), seule l'\'equation
+\eqref{eq:foreign_asset} intervient dans la simulation.
+\end{tcolorbox}
+
+\subsection{Discr\'etisation (sch\'ema log-Euler exact sous GBM)}
+
+Le sch\'ema log-Euler est exact pour le GBM (pas de biais de discr\'etisation) :
+
+\begin{align}
+  S^{0,\ell}_{t+\Delta t} &= S^{0,\ell}_t \exp\!\Bigl[\Bigl(r^0 - \tfrac{(\sigma^{0,\ell})^2}{2}\Bigr)\Delta t
+    + \sigma^{0,\ell}\sqrt{\Delta t}\,\widetilde{Z}^{0,\ell}\Bigr] \\
+  X^i_{t+\Delta t} &= X^i_t \exp\!\Bigl[\Bigl(r^0 - r^i - \tfrac{(\sigma^{i,X})^2}{2}\Bigr)\Delta t
+    + \sigma^{i,X}\sqrt{\Delta t}\,\widetilde{Z}^{i,X}\Bigr] \\
+  S^{i,\ell}_{t+\Delta t} &= S^{i,\ell}_t \exp\!\Bigl[\Bigl(r^i - \rho_{i\ell,iX}\sigma^{i,\ell}\sigma^{i,X}
+    - \tfrac{(\sigma^{i,\ell})^2}{2}\Bigr)\Delta t + \sigma^{i,\ell}\sqrt{\Delta t}\,\widetilde{Z}^{i,\ell}\Bigr]
+\end{align}
+
+o\`u $\widetilde{\mathbf{Z}} = L \boldsymbol{\xi}$ avec $\boldsymbol{\xi} \sim \mathcal{N}(0, I_N)$
+et $L$ le facteur de Cholesky de $\rho$ (tel que $LL^\top = \rho$).
+
+\subsection{Structure de payoff g\'en\'eral}
+
+Pour des dates de constatation $0 \le t_1 < \cdots < t_M = T$, l'outil peut pricer
+tout flux pay\'e en $T$ de la forme :
+
+\[
+  \psi\!\bigl(\bar{S}_{t_1}, \dots, \bar{S}_{t_M},\, \bar{X}_{t_1}, \dots, \bar{X}_{t_M}\bigr)
+\]
+
+Le prix \`a $t=0$ sous $\mathbb{Q}^0$ est :
+
+\[
+  P_0 = e^{-r^0 T}\,\mathbb{E}^{\mathbb{Q}^0}\!\bigl[\psi\bigl(\bar{S}_{t_1}, \dots, \bar{S}_{t_M},
+  \bar{X}_{t_1}, \dots, \bar{X}_{t_M}\bigr)\bigr]
+\]
+
+Estim\'e par Monte Carlo : $\hat{P}_0 = e^{-r^0 T} \cdot \frac{1}{n}\sum_{j=1}^n
+\psi^{(j)}$ avec erreur standard $\widehat{\text{SE}} = e^{-r^0 T}\cdot\hat{\sigma}_\psi/\sqrt{n}$
+et intervalle de confiance \`a 95\% : $\hat{P}_0 \pm 1.96\,\widehat{\text{SE}}$.
+
+\newpage
+% ============================================================
+\section{Module Pricing v2.0 -- \texttt{TradingDashboard.Pricing}}
+% ============================================================
+
+\subsection{Structure des dossiers}
+
+\begin{itemize}[leftmargin=1.5em]
+  \item \textbf{BlackScholes/} -- pricer analytique vanilles (inchang\'e de v1.2).
+  \item \textbf{PathGenerators/} -- g\'en\'erateurs de trajectoires (nouveau en v2.0).
+  \item \textbf{Payoffs/} -- tous les payoffs (\'etendu en v2.0).
+  \item \textbf{VarianceReduction/} -- r\'eductions de variance (nouveau en v2.0).
+  \item \textbf{Engine/} -- moteur MC et pricer de portefeuille (nouveau en v2.0).
+  \item \textbf{Greeks/} -- calculateur de sensibilit\'es (inchang\'e).
+  \item \textbf{Strategy/} -- factories et strat\'egies (\'etendu en v2.0).
+\end{itemize}
+
+% ============================================================
+\subsection{BlackScholes/ -- Inchang\'e de v1.2}
+
+\cs{BlackScholesFormulas.cs}, \cs{VanillaOptionPricer.cs}, \cs{GreeksCalculator.cs},
+\cs{PricingResult.cs} : identiques \`a la v1.2. Se reporter \`a la section correspondante.
+La m\'ethode \cs{VanillaOptionPricer} accepte d\'esormais un \cs{MarketEnvironment}
+en plus du \cs{MarketSnapshot} (via \cs{FromSingleAsset}).
+
+% ============================================================
+\subsection{PathGenerators/}
+
+\subsubsection{\texttt{GbmPathGenerator.cs} -- Mono-actif (refactor de GBMPathSimulator)}
+
+Impl\'emente \cs{IPathGenerator}. Encapsule l'ancien \cs{GBMPathSimulator} de v1.2
+et retourne un \cs{SimulatedPaths} de dimensions $[1, N_\text{paths}, N_\text{steps}+1]$.
+
+Aucune logique math\'ematique chang\'ee. Seule l'interface de retour est mise \`a jour.
+L'\cs{AssetMapping} contient un unique \'el\'ement avec le ticker du sous-jacent.
+
+\textbf{R\'etrocompatibilit\'e :} une m\'ethode \cs{SimulatePath(Random rng) : double[]} est
+conserv\'ee pour les tests unitaires existants.
+
+\subsubsection{\texttt{MultiAssetGbmPathGenerator.cs} -- Multi-actifs domestiques}
+
+\textbf{Cas couvert :} $\bar{n} = 0$ (pas de devise \'etrang\`ere). Tous les actifs sont
+dans la devise domestique. Taille du vecteur facteur : $N = n_0$.
+
+\textbf{Algorithme :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Lire la sous-matrice de corr\'elation $\rho_0 \in \mathcal{M}_{n_0}(\mathbb{R})$
+        depuis \cs{env.Correlation.Sub(domesticIndices)}.
+  \item R\'ecup\'erer le facteur de Cholesky $L_0$ (pr\'e-calcul\'e dans \cs{GlobalCorrelationMatrix}).
+  \item Pour chaque pas de temps $\Delta t$ et chaque sc\'enario $j$ :
+        \begin{enumerate}[leftmargin=1.5em]
+          \item G\'en\'erer $\boldsymbol{\xi} \sim \mathcal{N}(0, I_{n_0})$.
+          \item Calculer $\widetilde{\mathbf{Z}} = L_0\,\boldsymbol{\xi}$.
+          \item Appliquer l'\'equation \eqref{eq:dom_asset} pour chaque actif $\ell$.
+        \end{enumerate}
+  \item Retourner \cs{SimulatedPaths} avec tenseur $[n_0, N_\text{paths}, N_\text{steps}+1]$.
+\end{enumerate}
+
+\begin{tcolorbox}[constraint]
+\textbf{Pas de r\'eallocation par sc\'enario.} Allouer le tenseur de sortie une seule
+fois avant la boucle principale. \cs{Parallel.For} avec \cs{ThreadLocal<Random>}
+sur la dimension sc\'enario. Chaque thread g\`ere un sous-ensemble de sc\'enarios.
+\end{tcolorbox}
+
+\subsubsection{\texttt{MultiCurrencyGbmPathGenerator.cs} -- Multi-devises (cas g\'en\'eral)}
+
+Impl\'emente le mod\`ele complet de la section~3. Prend en charge $\bar{n} \ge 1$ devises
+\'etrang\`eres avec leurs actifs et taux FX.
+
+\textbf{Taille du vecteur facteur :} $N = \sum_{i=0}^{\bar{n}} n_i + \bar{n}$.
+
+\textbf{Algorithme :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item V\'erifier que l'\cs{AssetMapping} de \cs{env.Correlation} respecte l'ordonnancement
+        de la section~3.2 (domestiques, puis \'etrangers par devise, puis FX).
+  \item R\'ecup\'erer le facteur de Cholesky $L \in \mathcal{M}_N(\mathbb{R})$ depuis
+        \cs{env.Correlation.CholeskyFactor}.
+  \item Pour chaque sc\'enario $j$ et chaque pas de temps $\Delta t$ :
+        \begin{enumerate}[leftmargin=1.5em]
+          \item G\'en\'erer $\boldsymbol{\xi} \sim \mathcal{N}(0, I_N)$.
+          \item Calculer $\widetilde{\mathbf{Z}} = L\,\boldsymbol{\xi}$.
+          \item Appliquer \eqref{eq:dom_asset} aux actifs domestiques.
+          \item Appliquer \eqref{eq:fx_rate} aux taux de change $X^i$.
+          \item Appliquer \eqref{eq:foreign_asset} aux actifs \'etrangers, en lisant
+                $\rho_{i\ell,iX}$ dans la matrice de corr\'elation globale.
+        \end{enumerate}
+  \item Retourner \cs{SimulatedPaths} avec tenseur $[N, N_\text{paths}, N_\text{steps}+1]$.
+\end{enumerate}
+
+\textbf{Cas d\'eg\'en\'er\'es (test d'architecture) :}
+\begin{itemize}[leftmargin=1.5em]
+  \item $\bar{n}=0$, $n_0=1$ : doit produire des trajectoires identiques (en loi) au \cs{GbmPathGenerator}.
+  \item $\bar{n}=1$, $n_1=0$ : simulation d'un seul taux FX, v\'erifier que la d\'erive est $r^0 - r^1$.
+\end{itemize}
+
+\begin{tcolorbox}[todo]
+\textbf{HestonPathGenerator, LocalVolPathGenerator, LSVPathGenerator.} Ces g\'en\'erateurs
+impl\'ementeront la m\^eme interface \cs{IPathGenerator}. Ils seront d\'evelopp\'es dans
+des it\'erations ult\'erieures apr\`es calibration de la surface de volatilit\'e. L'architecture
+de la v2.0 garantit qu'aucun payoff ni aucun moteur MC ne devra \^etre modifi\'e lors
+de leur introduction.
+\end{tcolorbox}
+
+% ============================================================
+\subsection{Payoffs/}
+
+Tous les payoffs impl\'ementent \cs{IPayoff}. La m\'ethode \cs{Compute(SimulatedPaths paths)}
+commence syst\'ematiquement par \cs{paths.Extract(RequiredAssets)} pour isoler la
+tranche pertinente.
+
+\subsubsection{Payoffs mono-actif existants (migration v1.2 $\to$ v2.0)}
+
+\cs{AsianCallPayoff}, \cs{AsianPutPayoff}, \cs{LookbackFixedStrikeCallPayoff},
+\cs{LookbackFixedStrikePutPayoff} : logique de calcul inchang\'ee, seule la signature
+de \cs{Compute} est mise \`a jour pour prendre \cs{SimulatedPaths}.
+
+\subsubsection{\texttt{Payoffs/FloatingLookbackCallPayoff.cs} et \texttt{FloatingLookbackPutPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Lookback \`a strike flottant.}
+\[
+  \text{FloatingLookbackCall} = \max\!\Bigl(S_T - \min_{t \in [0,T]} S_t,\; 0\Bigr)
+  = S_T - \min_{t} S_t
+\]
+\[
+  \text{FloatingLookbackPut} = \max\!\Bigl(\max_{t \in [0,T]} S_t - S_T,\; 0\Bigr)
+  = \max_{t} S_t - S_T
+\]
+Les deux expressions de droite sont exactes car le floating lookback call (resp. put)
+est toujours $\ge 0$ par construction. Des formules ferm\'ees existent sous GBM
+(Goldman-Sosin-Gatto 1979) et servent de validation des r\'esultats Monte Carlo.
+\end{tcolorbox}
+
+Impl\'ementation : \cs{path.Min()} et \cs{path.Max()} sur la trajectoire compl\`ete.
+
+\subsubsection{\texttt{Payoffs/BarrierPayoffs.cs} -- Famille barri\`ere}
+
+\begin{tcolorbox}[math]
+\textbf{Payoffs barri\`eres (type call, g\'en\'eralisable au put).}
+
+Soit $B$ le niveau de barri\`ere, $\mathbf{1}_A$ l'indicatrice de l'\'ev\'enement $A$.
+
+\vspace{0.3em}
+\textit{Down-and-Out Call :}
+\[
+  \text{DaO Call} = \max(S_T - K, 0)\cdot\mathbf{1}\!\left\{\min_{t \in [0,T]} S_t > B\right\}
+\]
+\textit{Down-and-In Call :}
+\[
+  \text{DaI Call} = \max(S_T - K, 0)\cdot\mathbf{1}\!\left\{\min_{t \in [0,T]} S_t \le B\right\}
+\]
+\textit{Up-and-Out Call :}
+\[
+  \text{UaO Call} = \max(S_T - K, 0)\cdot\mathbf{1}\!\left\{\max_{t \in [0,T]} S_t < B\right\}
+\]
+\textit{Double Barrier Call} (deux barri\`eres $B_{\text{low}} < B_{\text{high}}$) :
+\[
+  \text{DB Call} = \max(S_T - K, 0)\cdot\mathbf{1}\!\left\{B_{\text{low}} < \min_t S_t \text{ et } \max_t S_t < B_{\text{high}}\right\}
+\]
+\end{tcolorbox}
+
+\textbf{Correction de Broadie-Glasserman-Kou (BGK) pour la discr\'etisation.}
+En monitoring discret avec $M$ pas de temps, les barri\`eres sont syst\'ematiquement
+biais\'ees car on rate les extrema intra-p\'eriode. La correction BGK d\'ecale la barri\`ere
+de $\pm\beta\sigma\sqrt{\Delta t}$ avec $\beta \approx 0.5826$ :
+
+\[
+  B_{\text{eff}}^{\text{down}} = B \cdot e^{-\beta\sigma\sqrt{\Delta t}},\quad
+  B_{\text{eff}}^{\text{up}} = B \cdot e^{+\beta\sigma\sqrt{\Delta t}}
+\]
+
+\textbf{Impl\'ementation :} une classe abstraite \cs{BarrierPayoffBase} factorise le
+calcul de franchissement et l'application de la correction BGK. Les 10 types concrets
+h\'eritent de cette base et red\'efinissent uniquement la condition de franchissement.
+
+\textbf{Param\`etres constructeur (exemple \cs{DownAndOutCallPayoff}) :}
+\cs{(double strike, double barrier, double vol, double maturity, int steps, bool applyBgk = true)}
+
+\begin{tcolorbox}[note]
+La correction BGK est activ\'ee par d\'efaut. En tests de validation contre les formules
+ferm\'ees BS (Rubinstein-Reiner), la d\'esactiver (\cs{applyBgk = false}) et augmenter
+\cs{steps} jusqu'\`a convergence. L'\'ecart entre le r\'esultat avec et sans BGK mesure
+le biais de discr\'etisation r\'esiduel.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/DigitalPayoffs.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Digitales.}
+
+\textit{Cash-or-Nothing Call} (paiement $N$ si $S_T > K$) :
+\[
+  \text{CaN Call} = N \cdot \mathbf{1}\{S_T > K\}
+\]
+\textit{Asset-or-Nothing Call} (paiement $S_T$ si $S_T > K$) :
+\[
+  \text{AaN Call} = S_T \cdot \mathbf{1}\{S_T > K\}
+\]
+Formules ferm\'ees sous BS : $\text{CaN Call} = N \cdot e^{-rT} N(d_2)$,
+$\text{AaN Call} = S_0\, N(d_1)$. Servent de validation Monte Carlo.
+\end{tcolorbox}
+
+\textbf{Note de stabilit\'e num\'erique.} Les digitales ont un vega tr\`es peak\'e pr\`es
+du strike \`a maturit\'e. La m\'ethode brute Monte Carlo convergera lentement. Une
+am\'elioration possible (non exig\'ee en v2.0) est le lissage du payoff indicateur
+(\textit{fuzzy boundary}).
+
+\subsubsection{\texttt{Payoffs/VarianceSwapPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Variance Swap.} Notionnel $N_\text{var}$, strike de variance $K_\text{var}$.
+
+La variance r\'ealis\'ee discr\`ete sur $M$ retours log est :
+\[
+  \sigma^2_\text{r\'ealis\'ee} = \frac{252}{M} \sum_{j=1}^{M} \left[\ln\frac{S_{t_j}}{S_{t_{j-1}}}\right]^2
+\]
+
+Payoff du vendeur de variance swap (paiement en $T$) :
+\[
+  \text{VarianceSwap} = N_\text{var} \cdot \bigl(\sigma^2_\text{r\'ealis\'ee} - K_\text{var}\bigr)
+\]
+
+Sous BS, $\mathbb{E}^{\mathbb{Q}}[\sigma^2_\text{r\'ealis\'ee}] = \sigma^2_\text{implicite}$
+exactement en monitoring continu. Le pricer Monte Carlo permet de quantifier le biais
+de monitoring discret.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/VolatilitySwapPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Volatility Swap.} Payoff analogique mais sur la volatilit\'e r\'ealis\'ee :
+\[
+  \text{VolatilitySwap} = N_\text{vol} \cdot \bigl(\sigma_\text{r\'ealis\'ee} - K_\text{vol}\bigr),
+  \quad \sigma_\text{r\'ealis\'ee} = \sqrt{\sigma^2_\text{r\'ealis\'ee}}
+\]
+Pas de r\'eplication statique exacte m\^eme sous BS. Monte Carlo est la m\'ethode de
+r\'ef\'erence. $\mathbb{E}[\sigma_\text{r\'ealis\'ee}] < \sqrt{\mathbb{E}[\sigma^2_\text{r\'ealis\'ee}]}$
+par l'in\'egalit\'e de Jensen, d'o\`u la \textit{convexity adjustment} entre variance swap
+et volatility swap.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/CliquetPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Cliquet (\textit{resetted-strike}).} Dates de reset $0 = T_0 < T_1 < \cdots < T_M = T$,
+cap $c \ge 0$, floor $f \le 0$.
+
+Le retour local plafonn\'e-planch\'e sur la p\'eriode $[T_{k-1}, T_k]$ est :
+\[
+  r_k = \max\!\Bigl(f,\;\min\!\Bigl(c,\; \frac{S_{T_k} - S_{T_{k-1}}}{S_{T_{k-1}}}\Bigr)\Bigr)
+\]
+Payoff global :
+\[
+  \text{Cliquet} = \max\!\Bigl(0,\; \sum_{k=1}^M r_k\Bigr)
+\]
+\textbf{Sensibilit\'e au mod\`ele.} Le cliquet d\'epend de la \textit{forward volatility}
+(vol implicite pour des options forward-start), non directement observable. Deux mod\`eles
+calibr\'es identiquement \`a la m\^eme surface de vol statique peuvent produire des prix
+de cliquet tr\`es diff\'erents selon leur dynamique de vol future.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/MultiAsset/BasketPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Basket Call.} Poids $w_i \ge 0$, $\sum_i w_i = 1$, actifs $S^1, \dots, S^n$.
+\[
+  \text{BasketCall} = \max\!\Bigl(\sum_{i=1}^n w_i S^i_T - K,\; 0\Bigr)
+\]
+Pas de formule ferm\'ee pour la somme pond\'er\'ee log-normale. Monte Carlo est exact.
+\end{tcolorbox}
+
+\cs{RequiredAssets} retourne tous les tickers du panier. \cs{Compute} extrait chaque
+tranche du tenseur, construit la moyenne pond\'er\'ee et applique le max.
+
+\subsubsection{\texttt{Payoffs/MultiAsset/WorstOfPayoff.cs} et \texttt{BestOfPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Worst-of / Best-of Call.} Actifs $S^1, \dots, S^n$ exprim\'es en rendement.
+\[
+  \text{WorstOfCall} = \max\!\Bigl(\min_{i} \frac{S^i_T}{S^i_0} \cdot S^{\text{ref}}_0 - K,\; 0\Bigr)
+\]
+\[
+  \text{BestOfCall} = \max\!\Bigl(\max_{i} S^i_T - K,\; 0\Bigr)
+\]
+Le worst-of est structurellement plus cher en termes de prime \`a vendre mais moins
+cher \`a acheter qu'un basket, car le payoff est minor\'e par le pire performer. Il est
+le constituant de base de tous les autocalls.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/MultiAsset/SpreadPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Spread Option.} Deux actifs $S^1$ et $S^2$.
+\[
+  \text{SpreadOption} = \max(S^1_T - S^2_T - K,\; 0)
+\]
+Cas particulier $K = 0$ : option d'\'echange de Margrabe, avec formule ferm\'ee
+$\text{Margrabe}(S^1, S^2, \sigma^1, \sigma^2, \rho_{12}, T)$ servant de validation.
+\end{tcolorbox}
+
+\subsubsection{\texttt{Payoffs/MultiAsset/QuantoPayoff.cs}}
+
+\begin{tcolorbox}[math]
+\textbf{Quanto Call.} Actif \'etranger $S^{i,\ell}$, taux FX $X^i$ fix\'e contractuellement
+au niveau $\bar{X}$ (d\'eterministe). Paiement en devise domestique.
+\[
+  \text{QuantoCall} = \bar{X} \cdot \max(S^{i,\ell}_T - K,\; 0)
+\]
+La d\'erive de $S^{i,\ell}$ sous $\mathbb{Q}^0$ est $r^i - \rho_{i\ell,iX}\sigma^{i,\ell}\sigma^{i,X}$
+(\'equation~\eqref{eq:foreign_asset}) : l'ajustement quanto est intrins\`eque \`a la
+simulation. La simulation du taux FX $X^i$ n'est pas n\'ecessaire pour ce payoff
+(il est fix\'e contractuellement), mais $\rho_{i\ell,iX}$ intervient dans la d\'erive.
+\end{tcolorbox}
+
+\subsubsection{Payoffs structured products (placeholders)}
+
+\begin{tcolorbox}[todo]
+\textbf{AutocallAthenaPayoff, AutocallPhoenixPayoff, ReverseConvertiblePayoff.}
+
+Ces payoffs requi\`erent un moteur MC sous LSV (Local Stochastic Volatility) pour
+\^etre \'economiquement pertinents. Sous BS, le pricer produit une r\'ef\'erence valide
+en structure (test de signe, mono-convexity) mais pas un prix de march\'e.
+
+L'interface \cs{IPayoff} est d\'ej\`a adapt\'ee. Ces classes seront impl\'ement\'ees lors
+de l'introduction du \cs{LSVPathGenerator}. Activer des \cs{NotImplementedException}
+pour l'instant.
+\end{tcolorbox}
+
+% ============================================================
+\subsection{VarianceReduction/}
+
+\subsubsection{\texttt{BrownianBridgeVarianceReduction.cs}}
+
+Impl\'emente \cs{IVarianceReduction}. Applicable aux payoffs \`a barri\`ere pour
+corriger le biais de discr\'etisation via la probabilit\'e de franchissement intra-p\'eriode.
+
+\begin{tcolorbox}[math]
+\textbf{Pont brownien pour les barrières.} Soit $S_k = S_{t_k}$ et $S_{k+1} = S_{t_{k+1}}$
+les spots simulés aux deux extrémités d'un intervalle $[t_k, t_{k+1}]$. La probabilit\'e
+que le processus GBM franchisse une barri\`ere inf\'erieure $B$ entre $t_k$ et $t_{k+1}$
+conditionnellement aux valeurs aux bornes est :
+
+\[
+  p_k = \exp\!\left(-\frac{2\,\ln(S_k/B)\,\ln(S_{k+1}/B)}{\sigma^2\Delta t}\right)
+\]
+
+Le payoff knock-out est multipli\'e par $\prod_k (1 - p_k)$ au lieu d'utiliser
+l'indicatrice exacte (qui n\'ecessiterait des pas tr\`es fins). Cette correction
+\'elimine le biais de discr\'etisation \`a l'ordre dominant.
+\end{tcolorbox}
+
+\subsubsection{\texttt{GeometricAsianControlVariate.cs}}
+
+Impl\'emente \cs{IVarianceReduction}. G\'en\`ere simultan\'ement la moyenne g\'eom\'etrique
+et arithm\'etique sur le m\^eme path.
+
+\begin{tcolorbox}[math]
+\textbf{Variable de contr\^ole g\'eom\'etrique.} Soit $\bar{S}_\text{arith}$ la moyenne
+arithm\'etique et $\bar{S}_\text{g\'eom}$ la moyenne g\'eom\'etrique sur les m\^emes
+observations. La moyenne g\'eom\'etrique a une formule ferm\'ee sous BS (Kemna-Vorst).
+On exploite la forte corr\'elation entre $\psi_\text{arith}$ et $\psi_\text{g\'eom}$.
+
+Estimateur corrig\'e :
+\[
+  \hat{P}_\text{arith} = \bar{\psi}_\text{arith}
+    - \hat{\beta}\,(\bar{\psi}_\text{g\'eom} - P_\text{g\'eom}^{\text{BS}})
+\]
+o\`u $\hat{\beta}$ est estim\'e par r\'egression OLS sur les sc\'enarios et
+$P_\text{g\'eom}^{\text{BS}}$ est le prix analytique exact de l'option g\'eom\'etrique.
+\end{tcolorbox}
+
+\subsubsection{\texttt{AntitheticVarianceReduction.cs}}
+
+Pour chaque sc\'enario $\boldsymbol{\xi}^{(j)}$, g\'en\`ere le sc\'enario antith\'etique
+$-\boldsymbol{\xi}^{(j)}$ et retourne la moyenne des deux payoffs. R\'eduit la variance
+sans biais. Applicable \`a tous les payoffs.
+
+% ============================================================
+\subsection{Engine/}
+
+\subsubsection{\texttt{MonteCarloEngine.cs} -- Moteur g\'en\'eral}
+
+Impl\'emente \cs{IMonteCarloEngine}. Orchestre le g\'en\'erateur, la r\'eduction de
+variance et le payoff.
+
+\textbf{Algorithme \cs{PriceAsync} :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item \cs{gen.Generate(env, sim)} -- tenseur de trajectoires.
+  \item Appliquer \cs{IVarianceReduction.Apply(paths, env)} si pr\'esente.
+  \item \cs{payoff.Compute(paths)} -- vecteur de payoffs bruts $\psi^{(j)}$.
+  \item Facteur d'actualisation : $D = e^{-r^0 T}$.
+  \item $\hat{P} = D \cdot \frac{1}{n}\sum_j \psi^{(j)}$.
+  \item $\hat{\sigma}_\psi^2 = \frac{1}{n-1}\sum_j (\psi^{(j)} - \bar{\psi})^2$.
+  \item $\text{SE} = D \cdot \hat{\sigma}_\psi / \sqrt{n}$, $\text{CI}_{95} = 1.96 \cdot \text{SE}$.
+  \item Retourner \cs{PricingResult} avec prix, SE, CI, m\'ethode, horodatage.
+\end{enumerate}
+
+\textbf{M\'ethode \cs{ComputeGreeksAsync} -- diff\'erences finies centrales :}
+
+Tous les bumps sont lanc\'es en parall\`ele via \cs{Task.WhenAll}. Le g\'en\'erateur
+utilise la m\^eme seed pour garantir la comparabilit\'e des simulations bump\'ees
+et non bump\'ees (common random numbers).
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Greek} & \textbf{Formule} & \textbf{Bump} \\
+\midrule
+Delta & $\frac{P(S_0+h) - P(S_0-h)}{2h}$ & $h = 0.01 \times S_0$ \\
+Gamma & $\frac{P(S_0+h) - 2P(S_0) + P(S_0-h)}{h^2}$ & m\^eme $h$ \\
+Vega  & $\frac{P(\sigma+\delta\sigma) - P(\sigma-\delta\sigma)}{2\,\delta\sigma}$ & $\delta\sigma = 0.01$ \\
+Theta & $\frac{P(T-\delta T) - P(T)}{365\,\delta T}$ & $\delta T = 1/365$ \\
+Rho   & $\frac{P(r+\delta r) - P(r-\delta r)}{2\,\delta r}$ & $\delta r = 0.0001$ \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tcolorbox}[constraint]
+\textbf{Common random numbers pour les Greeks.} Si \cs{Seed} est renseign\'e dans
+\cs{SimulationParameters}, les simulations bump\'ees utilisent la m\^eme seed que la
+simulation de base. Cela r\'eduit drastiquement la variance des estimateurs de Greeks
+par diff\'erences finies (la variabilit\'e MC se compense entre les deux appels bump\'es).
+Sans cette technique, la variance du Delta MC peut \^etre plus grande que le signal.
+\end{tcolorbox}
+
+\subsubsection{\texttt{PortfolioPricer.cs} -- Simulation conjointe}
+
+C'est la pi\`ece ma\^itresse de l'architecture v2.0 pour le pricing de portefeuille.
+
+\textbf{Probl\`eme.} Si l'on price chaque position ind\'ependamment, les corr\'elations
+entre sous-jacents sont ignor\'ees. Un portefeuille long SPX / short Eurostoxx n'est
+pas la somme de deux positions isol\'ees~: leur corr\'elation d\'etermine le risque r\'eel.
+
+\textbf{Algorithme :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Collecter \cs{RequiredAssets} de chaque instrument du portefeuille.
+  \item D\'eduire l'univers global $\mathcal{U}$ (union sans doublon).
+  \item Extraire la sous-matrice de corr\'elation $\rho_\mathcal{U}$ depuis
+        \cs{env.Correlation.Sub(indices($\mathcal{U}$))}.
+  \item Lancer \textbf{une unique simulation conjointe} avec
+        \cs{MultiCurrencyGbmPathGenerator} sur $\mathcal{U}$.
+  \item Pour chaque instrument $k$ : extraire sa tranche via
+        \cs{paths.Extract(instrument.RequiredAssets)}.
+  \item Calculer \cs{payoff.Compute(subPaths)} pour chaque position.
+  \item PnL du portefeuille : $\text{PnL}^{(j)} = \sum_k q_k \cdot (D \cdot \psi_k^{(j)} - P_k^{(0)})$.
+  \item Retourner le vecteur de PnL et le prix du portefeuille.
+\end{enumerate}
+
+\textbf{M\'ethodes :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{Task<PortfolioPricingResult> PriceAsync(IReadOnlyList<Position> positions,}\\
+        \cs{MarketEnvironment env, SimulationParameters sim, CancellationToken ct)}
+  \item \cs{Task<double[]> SimulatePortfolioPnLAsync(...)} -- retourne le vecteur
+        brut des PnL sc\'enarios pour VaR/CVaR.
+\end{itemize}
+
+% ============================================================
+\subsection{Strategy/ -- Factories et dispatch}
+
+\subsubsection{\texttt{PricerFactory.cs} -- Version 2.0}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l}
+\toprule
+\textbf{Condition} & \textbf{Strat\'egie retourn\'ee} \\
+\midrule
+\cs{IsVanilla()} & \cs{BlackScholesPricingStrategy} \\
+\cs{IsExotic()} (mono-actif) & \cs{MonteCarloStrategy} avec \cs{GbmPathGenerator} \\
+\cs{IsFx()} & \cs{MonteCarloStrategy} avec \cs{MultiCurrencyGbmPathGenerator} \\
+\cs{IsMultiAsset()} & \cs{MonteCarloStrategy} avec \cs{MultiAssetGbmPathGenerator} \\
+\cs{IsStructured()} & \cs{NotImplementedException} (placeholder) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Invariant :} aucun \cs{if}/\cs{switch} sur \cs{ProductType} en dehors de
+\cs{PricerFactory} et \cs{PayoffFactory}. Le dispatch est centralis\'e.
+
+\begin{tcolorbox}[deliverable]
+Pricing v2.0 est termin\'e quand :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{MultiAssetGbmPathGenerator} : les paths de deux actifs corr\'el\'es \`a $\rho=0.8$
+        ont une corr\'elation empirique dans $[0.79, 0.81]$ sur $10^5$ sc\'enarios.
+  \item \cs{DownAndOutCallPayoff} avec \cs{applyBgk = false} converge vers la formule
+        Rubinstein-Reiner \`a $\pm 0.5\%$ pour \cs{steps = 1000}.
+  \item \cs{FloatingLookbackCallPayoff} : prix MC $\in \pm 1\%$ de Goldman-Sosin-Gatto
+        pour $10^5$ sc\'enarios, \cs{steps = 252}.
+  \item \cs{VarianceSwapPayoff} : $\mathbb{E}[\sigma^2_\text{r\'ealis\'ee}] \approx \sigma^2_\text{impl.}$
+        \`a $\pm 0.1\%$ pour monitoring continu (grand $M$).
+  \item \cs{PortfolioPricer} sur un long call SPX + short call Eurostoxx corr\'el\'es :
+        le prix du portefeuille diff\`ere du somme des prix individuels (preuve que la
+        simulation est bien conjointe).
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+% ============================================================
+\section{Module Risk v2.0 -- \texttt{TradingDashboard.Risk}}
+% ============================================================
+
+\begin{tcolorbox}[note]
+\textbf{Distinction fondamentale Pricing MC vs Risk MC.}
+Le Monte Carlo de \cs{.Pricing} price un \textit{instrument individuel} : il calcule
+$E[e^{-rT}\,\text{Payoff}(S_T)]$. Le Monte Carlo de \cs{.Risk} simule un
+\textit{portefeuille} : il distribue les pertes sur $H$ jours et en d\'eduit la VaR et la CVaR.
+Ce sont deux usages distincts du m\^eme \cs{GBMPathSimulator} -- d'o\`u son emplacement
+dans \cs{.Pricing} accessible par les deux modules.
+\end{tcolorbox}
+
+\subsection{MonteCarlo/ -- Simulation conjointe de portefeuille}
+
+\subsubsection{\texttt{PortfolioSimulator.cs}}
+
+\textbf{R\^ole :} simuler la distribution de PnL d'un portefeuille sur un horizon
+$H$ (typiquement 1 jour ou 10 jours) en g\'en\'erant des trajectoires GBM pour chaque
+sous-jacent du portefeuille. Retourne la distribution empirique des pertes, la VaR
+et la CVaR.
+
+\textbf{Mise \`a jour critique par rapport \`a v1.2.} La v1.2 simulait chaque
+sous-jacent ind\'ependamment, d\'etruisant les corr\'elations. La v2.0 utilise
+\cs{PortfolioPricer.SimulatePortfolioPnLAsync} pour une simulation conjointe.
+
+\textbf{Constructeur :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{PortfolioSimulator(GBMPathSimulator simulator, IPricer<PricingResult> pricer,}\\
+        \cs{int numberOfScenarios = 10\_000)}
+  \item \cs{GBMPathSimulator} inject\'e depuis \cs{.Pricing} -- pas de \cs{new}
+        interne. C'est la r\'eutilisation inter-modules \'evoqu\'ee dans l'architecture.
+\end{itemize}
+
+\textbf{Algorithme VaR/CVaR :}
+\begin{enumerate}[leftmargin=1.5em]
+  \item Appeler \cs{portfolioPricer.SimulatePortfolioPnLAsync(positions, env,}\\
+        \cs{sim with \{ MaturityInYears = horizon/252.0 \}, ct)}.
+  \item Trier le vecteur de PnL $(\text{PnL}^{(1)}, \dots, \text{PnL}^{(n)})$ par ordre croissant.
+  \item $\text{VaR}_{1-\alpha} = -\text{PnL}_{[\alpha n]}$ (l'\`eme percentile inf\'erieur).
+  \item $\text{CVaR}_{1-\alpha} = -\dfrac{1}{\lfloor\alpha n\rfloor}\sum_{j \le \alpha n}\text{PnL}^{(j)}$.
+  \item V\'erifier l'invariant : $\text{CVaR} \ge \text{VaR}$ (propri\'et\'e de coh\'erence).
+\end{enumerate}
+
+\textbf{R\'etrocompatibilit\'e :} pour un portefeuille mono-actif, \cs{PortfolioSimulator}
+se comporte comme en v1.2 gr\^ace \`a \cs{MarketEnvironment.FromSingleAsset}.
+
+\textbf{M\'ethodes principales :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{Task<VaRResult> ComputeVaRAsync(IReadOnlyList<Position> positions,}\\
+        \cs{MarketSnapshot snapshot, int horizon = 1,}\\
+        \cs{double confidenceLevel = 0.99, CancellationToken ct = default)}
+  \item \cs{Task<CVaRResult> ComputeCVaRAsync(...)} -- m\^eme signature, calcule la perte
+        conditionnelle au-del\`a de la VaR.
+  \item \cs{Task<double[]> SimulatePortfolioReturns(IReadOnlyList<Position> positions,}\\
+        \cs{MarketSnapshot snapshot, int horizon, CancellationToken ct)} -- retourne
+        le vecteur brut des PnL simul\'es pour histogramme.
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{Parallel.For + ThreadLocal<Random> :} la boucle de simulation est CPU-bound.
+Utilise \cs{Parallel.For} avec \cs{ThreadLocal<Random>} seed\'e par thread. D\'emontre
+le speedup par rapport \`a une version s\'equentielle. Mesure et documente.\\[4pt]
+\textbf{Interlocked sur les accumulateurs :} comme pour le pricer MC, l'accumulation
+des PnL scenarios doit \^etre thread-safe. Utilise un tableau pr\'e-allou\'e index\'e par
+scenario (pas d'accumulation partageable) ou \cs{Parallel.For} avec \cs{localFinally}.
+\end{tcolorbox}
+
+\begin{tcolorbox}[todo]
+\textbf{Greeks analytiques multi-actifs (Vanna, Volga, Vanna crois\'ee).}
+Pour les produits multi-actifs, les Greeks de second ordre (Vanna Equity/FX, Gamma
+crois\'e) requi\`erent des m\'ethodes num\'eriques de second ordre ou des approches
+pathwise / Malliavin plus avanc\'ees. Impl\'ementation pr\'evue avec l'introduction
+des mod\`eles \`a volatilit\'e stochastique.
+\end{tcolorbox}
+
+\subsubsection{\texttt{VaRResult.cs} et \texttt{CVaRResult.cs}}
+
+\textbf{Types :} deux \cs{record} immuables.
+
+\cs{VaRResult} :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{decimal VaR} -- perte maximale au niveau de confiance choisi.
+  \item \cs{double ConfidenceLevel} -- ex: 0.99.
+  \item \cs{int Horizon} -- en jours ouvrables.
+  \item \cs{int ScenariosUsed}
+  \item \cs{DateTimeOffset ComputedAt}
+\end{itemize}
+
+\cs{CVaRResult} :
+\begin{itemize}[leftmargin=1.5em]
+  \item Inclut toutes les propri\'et\'es de \cs{VaRResult}.
+  \item \cs{decimal CVaR} -- perte conditionnelle esp\'er\'ee au-del\`a de la VaR.
+  \item \cs{decimal[] TailLosses} -- distribution des pertes dans la queue.
+\end{itemize}
+
+% ============================================================
+\subsection{PnL/ -- Moteur de calcul de PnL}
+
+\subsubsection{\texttt{PnLEngine.cs}}
+
+\textbf{R\^ole :} s'abonner aux mises \`a jour de march\'e et recalculer le PnL de
+l'ensemble du portefeuille \`a chaque tick. Impl\'emente \cs{IObserver<MarketEnvironment>}
+plut\^ot que \cs{IObserver<MarketSnapshot>}, afin que les Greeks agr\'eg\'es tiennent
+compte des positions FX crois\'ees.
+
+\textbf{M\'ethodes principales :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{void OnNext(MarketEnvironment env)} -- re\c{c}oit une nouvelle mise \`a jour
+        d'environnement, recalcule le PnL de toutes les positions actives.
+  \item \cs{void OnError(Exception error)} -- log l'erreur sans propagation.
+  \item \cs{void OnCompleted()} -- flush final, sauvegarde en DB.
+  \item \cs{Task<PnLSummary> GetCurrentPnLAsync(Guid positionId, CancellationToken ct)}
+  \item \cs{Task<PortfolioPnL> GetPortfolioPnLAsync(CancellationToken ct)}
+\end{itemize}
+
+\textbf{Calcul du PnL :}
+\[
+  \text{PnL Daily} = Q \times (P_{\text{current}} - P_{\text{previous}})
+\]
+\[
+  \text{PnL MTD} = Q \times (P_{\text{current}} - P_{\text{first of month}})
+\]
+
+\begin{tcolorbox}[constraint]
+\textbf{Pattern Observer complet :} \cs{PnLEngine} impl\'emente \cs{IObserver<MarketEnvironment>}.
+\cs{SimulatedMarketDataFeed} impl\'emente \cs{IObservable<MarketSnapshot>}. L'abonnement
+via \cs{feed.Subscribe(pnlEngine)} retourne un \cs{IDisposable} stock\'e et appel\'e
+dans le \cs{Dispose()} du \cs{PnLEngine}.\\[4pt]
+\textbf{Thread-safety des events :} utiliser le pattern \cs{var h = PnLUpdated; h?.Invoke(...)}
+pour \'eviter la race condition entre check-null et invocation.
+\end{tcolorbox}
+
+\subsubsection{\texttt{PnLSummary.cs} et \texttt{PortfolioPnL.cs}}
+
+\cs{PnLSummary} (par position) :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{Guid PositionId}, \cs{string Ticker}
+  \item \cs{decimal DailyPnL}, \cs{decimal MTD}, \cs{decimal YTD}
+  \item \cs{Greeks CurrentGreeks}, \cs{DateTimeOffset ComputedAt}
+\end{itemize}
+
+\cs{PortfolioPnL} (agr\'egat) :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{decimal TotalDailyPnL}, \cs{decimal TotalMTD}, \cs{decimal TotalYTD}
+  \item \cs{Greeks AggregatedGreeks}
+  \item \cs{IReadOnlyList<PnLSummary> Positions}, \cs{DateTimeOffset AsOf}
+\end{itemize}
+
+% ============================================================
+\subsection{Limits/ -- V\'erification des limites de risque}
+
+\subsubsection{\texttt{LimitChecker.cs}}
+
+\textbf{R\^ole :} s'abonner aux mises \`a jour PnL et d\'eclencher une alerte si une
+limite est franchie. Impl\'emente \cs{IObserver<PortfolioPnL>}.
+
+\textbf{Limites \`a v\'erifier :}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\ttfamily}l l X}
+\toprule
+\textbf{Limite} & \textbf{Seuil par d\'efaut} & \textbf{Comportement} \\
+\midrule
+DailyLossLimit   & $-50\,000$ EUR              & Alerte Critical si PnL Daily $<$ seuil \\
+DeltaLimit       & $|\Delta_{\text{net}}| > 100$ & Alerte Warning \\
+VegaLimit        & $|\text{Vega}_{\text{net}}| > 500$ & Alerte Warning \\
+PositionSizeLimit & Notionnel $> 10$M EUR      & Alerte Info \\
+VaRBreachLimit   & VaR $>$ 200\,000 EUR        & Alerte Critical (si VaR calcul\'ee) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{Comportements attendus :}
+\begin{itemize}[leftmargin=1.5em]
+  \item Une alerte ne doit \^etre d\'eclench\'ee qu'une seule fois par franchissement.
+  \item Les seuils sont injectables via \cs{LimitConfiguration}.
+  \item Chaque alerte est persist\'ee via \cs{IRepository<Alert>} inject\'e.
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{Test unitaire obligatoire :} l'alerte est d\'eclench\'ee exactement au
+franchissement du seuil, pas avant, pas deux fois. Utilise \cs{Mock<IRepository<Alert>>}
+(Moq) pour \'eviter la d\'ependance DB.
+\end{tcolorbox}
+
+% ============================================================
+\subsection{StressTesting/ -- Sc\'enarios de choc}
+
+\subsubsection{\texttt{StressTestEngine.cs}}
+
+\textbf{R\^ole :} \'evaluer l'impact de chocs de march\'e sur le portefeuille.
+Chaque sc\'enario tourne en parall\`ele via \cs{Task.WhenAll}.
+
+\textbf{Sc\'enarios requis :}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Sc\'enario}    & \textbf{Param\`etres}                        & \textbf{Description} \\
+\midrule
+SpotShock             & $-5\%$, $-10\%$, $-20\%$, $-30\%$           & Baisse du spot \\
+VolShock              & $+5$~pts, $+10$~pts, $+20$~pts               & Hausse de la volatilit\'e \\
+CombinedShock         & $-10\%$ spot $+$ $+10$~pts vol               & Sc\'enario combin\'e \\
+TailRisk              & $-40\%$ spot $+$ $+30$~pts vol               & Sc\'enario de queue \\
+CorrelationShock      & $\Delta\rho = +0.20$ sur toutes les paires   & Choc de corr\'elation \\
+FXShock               & $\pm 10\%$ sur EUR/USD                       & Choc de change \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\textbf{M\'ethodes principales :}
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{Task<IReadOnlyList<StressTestResult>> RunAllScenariosAsync(}\\
+        \cs{IReadOnlyList<Position> positions, IProgress<StressTestProgress> progress,}\\
+        \cs{CancellationToken ct)}
+  \item \cs{Task<StressTestResult> RunScenarioAsync(StressScenario scenario,}\\
+        \cs{IReadOnlyList<Position> positions, CancellationToken ct)}
+  \item \cs{StressTestMatrix BuildMatrix(IReadOnlyList<StressTestResult> results)}\\
+        via LINQ uniquement (\cs{GroupBy}, \cs{SelectMany}).
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{Task.WhenAll obligatoire :} chaque sc\'enario est une \cs{Task} ind\'ependante.\\[4pt]
+\textbf{IProgress<T> :} la progression rapport\'ee via \cs{IProgress<StressTestProgress>}.\\[4pt]
+\textbf{LINQ avanc\'e :} agr\'egation en matrice via \cs{GroupBy}/\cs{SelectMany}.
+Interdiction de boucles \cs{foreach} pour les transformations de donn\'ees.
+\end{tcolorbox}
+
+\subsubsection{\texttt{StressTestResult.cs} et \texttt{StressTestProgress.cs}}
+
+\cs{StressTestResult} :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{StressScenario Scenario}, \cs{Guid PositionId}, \cs{string Ticker}
+  \item \cs{decimal PnLImpact}, \cs{Greeks GreeksUnderShock}, \cs{DateTimeOffset ComputedAt}
+\end{itemize}
+
+\cs{StressTestProgress} :
+\begin{itemize}[leftmargin=1.5em]
+  \item \cs{int CompletedScenarios}, \cs{int TotalScenarios}, \cs{string CurrentScenarioName}
+  \item \cs{double PercentComplete} -- propri\'et\'e calcul\'ee.
+\end{itemize}
+
+% ============================================================
+\subsection{Feeds/ -- Simulation du flux de march\'e temps r\'eel}
+
+\subsubsection{\texttt{SimulatedMarketDataFeed.cs}}
+
+\textbf{R\^ole :} publier un \cs{MarketSnapshot} simul\'e toutes les secondes.
+Impl\'emente \cs{IObservable<MarketSnapshot>} et \cs{IMarketDataFeed}.
+
+\textbf{Comportements attendus :}
+\begin{itemize}[leftmargin=1.5em]
+  \item Prix spot simul\'e : $S_{t+1} = S_t \cdot (1 + \sigma\sqrt{dt} \cdot Z)$,
+        $Z \sim \mathcal{N}(0,1)$.
+  \item \cs{IDisposable Subscribe(IObserver<MarketSnapshot> observer)} -- d\'esabonnement
+        via \cs{Dispose()}.
+  \item \cs{Task StartAsync(CancellationToken ct)} -- boucle de publication
+        (\cs{Task.Delay(1000, ct)}).
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{Memory leak et Dispose :} d\'emontre le leak m\'emoire si l'abonnement n'est
+pas d\'esabonné (\cs{Dispose} sur le token de souscription), puis montre la correction.\\[4pt]
+\textbf{Event thread-safe :} pattern \cs{var snapshot = MarketUpdated; snapshot?.Invoke(...)}
+pour la notification des abonn\'es delegates.
+\end{tcolorbox}
+
+\begin{tcolorbox}[deliverable]
+Risk v2.0 est termin\'e quand :
+\begin{itemize}[leftmargin=1.5em]
+  \item CVaR $\ge$ VaR pour tout niveau de confiance et tout portefeuille test.
+  \item Un portefeuille long A / short B avec $\rho_{AB} = 0.9$ a une VaR
+        strictement inf\'erieure \`a $\text{VaR}(A) + \text{VaR}(B)$
+        (b\'en\'efice de diversification).
+  \item Un portefeuille long A / short B avec $\rho_{AB} = -1$ a une VaR proche de 0
+        (couverture parfaite).
+  \item \cs{PnLEngine} ne provoque aucun memory leak (test de d\'esabonnement Moq).
+  \item Les sc\'enarios de choc de corr\'elation sont ex\'ecut\'es en parall\`ele
+        via \cs{Task.WhenAll} et rapportent la progression via \cs{IProgress<T>}.
+\end{itemize}
+\end{tcolorbox}
+
+\newpage
+\section{TradingDashboard.Data}
+% ------------------------------------------------------------
+
+\begin{tcolorbox}[note]
+Ce projet est la couche de persistance de toute l'application. Il expose les données
+via des repositories et ne contient aucune logique métier. Toute règle financière
+appartient à \texttt{Core} ou \texttt{Risk}, pas ici.
+\end{tcolorbox}
+
+\subsection{TradingDbContext.cs -- Contexte Entity Framework Core}
+
+\textbf{Rôle} : point d'entrée unique vers la base de données SQLite. Hérite de
+\cs{DbContext} (EF Core 8).
+
+\textbf{Propriétés \cs{DbSet<T>} attendues :}
+\begin{itemize}
+  \item \cs{DbSet<Position> Positions}
+  \item \cs{DbSet<Instrument> Instruments}
+  \item \cs{DbSet<Trade> Trades}
+  \item \cs{DbSet<MarketData> MarketDataHistory}
+  \item \cs{DbSet<PnLSnapshot> PnLHistory}
+  \item \cs{DbSet<Alert> Alerts}
+\end{itemize}
+
+\textbf{Comportements attendus :}
+\begin{itemize}
+  \item Surcharger \cs{OnConfiguring} pour pointer vers \texttt{trading.db} (SQLite).
+  \item Surcharger \cs{OnModelCreating} pour configurer les relations et les
+        conversions de type (voir contraintes).
+  \item Configurer la relation 1-N entre \cs{Instrument} et \cs{Position} :
+        une position est obligatoirement liée à un instrument existant (clé étrangère
+        non nullable).
+  \item Configurer la relation 1-N entre \cs{Position} et \cs{PnLSnapshot} :
+        la suppression d'une position doit déclencher la suppression en cascade de
+        ses snapshots (\cs{DeleteBehavior.Cascade}).
+  \item Configurer la relation 1-N entre \cs{Position} et \cs{Alert} avec
+        \cs{DeleteBehavior.SetNull} (une alerte orpheline doit être conservée en
+        audit trail).
+  \item Stocker les Greeks (struct) en colonne JSON via un \emph{value converter}
+        EF Core. La colonne s'appelle \cs{GreeksJson} de type \cs{TEXT}.
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{IDisposable et cycle de vie :} \cs{TradingDbContext} implémente déjà
+\cs{IDisposable} via \cs{DbContext}. Partout où tu l'instancies manuellement
+(hors injection de dépendances), utilise un bloc \cs{using}. Comprends pourquoi
+l'oubli du \cs{Dispose} laisse la connexion SQLite ouverte et bloque les accès
+concurrents. \\[4pt]
+\textbf{Logging SQL :} Active \cs{EnableSensitiveDataLogging()} et
+\cs{LogTo(Console.WriteLine)} uniquement en mode Debug. Tu devras montrer le SQL
+généré par EF lors des entretiens -- c'est non négociable.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Migrations/ -- Migrations EF Core}
+
+\textbf{Règle absolue :} aucune modification manuelle de \texttt{trading.db}.
+Toute évolution du schéma passe par une migration nommée explicitement.
+
+\textbf{Migrations à créer dans cet ordre :}
+\begin{enumerate}
+  \item \texttt{InitialCreate} -- tables de base : Instruments, Positions, Trades.
+  \item \texttt{AddMarketDataHistory} -- table MarketData avec index sur
+        \cs{(InstrumentId, Timestamp)}.
+  \item \texttt{AddPnLAndAlerts} -- tables PnLSnapshot et Alerts, colonne
+        \cs{GreeksJson}.
+  \item \texttt{AddAlertAcknowledgedColumn} -- ajout de \cs{IsAcknowledged} et
+        \cs{AcknowledgedAt} sur la table Alerts.
+\end{enumerate}
+
+\begin{tcolorbox}[note]
+Chaque migration génère deux méthodes : \cs{Up()} et \cs{Down()}. Tu dois être
+capable d'expliquer ce que fait \cs{Down()} et dans quel cas elle est invoquée.
+C'est une question d'entretien classique sur EF Core.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Repositories/ -- Pattern Repository}
+
+\subsubsection{GenericRepository.cs}
+
+Implémente l'interface \cs{IRepository<T>} définie dans \texttt{Core}.
+\cs{T} est contraint par \cs{where T : class}.
+
+\textbf{Méthodes à implémenter :}
+\begin{itemize}
+  \item \cs{Task<T?> GetByIdAsync(Guid id, CancellationToken ct = default)}
+  \item \cs{Task<IReadOnlyList<T>> GetAllAsync(CancellationToken ct = default)}
+  \item \cs{Task AddAsync(T entity, CancellationToken ct = default)}
+  \item \cs{Task UpdateAsync(T entity, CancellationToken ct = default)}
+  \item \cs{Task DeleteAsync(Guid id, CancellationToken ct = default)}
+  \item \cs{Task SaveChangesAsync(CancellationToken ct = default)}
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{IQueryable obligatoire :} les méthodes qui filtrent des données doivent
+retourner \cs{IQueryable<T>} et non \cs{IEnumerable<T>}. La différence est
+fondamentale : \cs{IQueryable} compose la requête et la traduit en SQL ;
+\cs{IEnumerable} charge tout en mémoire puis filtre côté application (N+1
+problem). Tu devras montrer les deux comportements avec le logging SQL activé.
+\end{tcolorbox}
+
+\subsubsection{TradeRepository.cs}
+
+Hérite de \cs{GenericRepository<Trade>} et ajoute des requêtes métier.
+
+\textbf{Méthodes métier spécifiques :}
+\begin{itemize}
+  \item \cs{Task<IReadOnlyList<Trade>> GetTradesByDeskAsync(string desk, CancellationToken ct)}\\
+        Filtre les trades par desk. Doit utiliser \cs{IQueryable} et LINQ.
+  \item \cs{Task<IReadOnlyList<Trade>> GetTradesForInstrumentAsync(Guid instrumentId, CancellationToken ct)}\\
+        Inclure les données de l'instrument associé (\emph{eager loading} via
+        \cs{Include}).
+  \item \cs{Task<decimal> GetTotalNotionalByDeskAsync(string desk, CancellationToken ct)}\\
+        Agrégation SQL : utilise \cs{SumAsync} de EF Core, pas de Sum LINQ
+        sur une liste en mémoire.
+\end{itemize}
+
+\subsubsection{PositionRepository.cs}
+
+\textbf{Méthodes métier spécifiques :}
+\begin{itemize}
+  \item \cs{Task<IReadOnlyList<Position>> GetOpenPositionsAsync(CancellationToken ct)}\\
+        Filtre les positions dont le statut est \cs{Active}. Inclut l'instrument
+        et les 30 derniers snapshots PnL (eager loading limité).
+  \item \cs{Task<IReadOnlyList<Position>> GetPositionsByUnderlyingAsync(string ticker, CancellationToken ct)}\\
+        Joint sur la table Instruments pour filtrer par sous-jacent.
+  \item \cs{Task<Greeks> GetAggregatedGreeksAsync(CancellationToken ct)}\\
+        Somme les Greeks de toutes les positions actives. L'agrégation doit se
+        faire en mémoire après un seul appel DB (les Greeks sont en JSON, EF ne
+        peut pas les agréger en SQL).
+\end{itemize}
+
+\textbf{Démonstration obligatoire -- Eager vs Lazy Loading :}
+
+Tu dois implémenter et documenter les deux comportements sur
+\cs{GetOpenPositionsAsync} :
+\begin{itemize}
+  \item Version eager : \cs{.Include(p => p.Instrument).Include(p => p.PnLHistory)} --
+        1 requête SQL avec JOIN.
+  \item Version lazy : accès à \cs{position.Instrument} sans \cs{Include} --
+        déclenche N requêtes supplémentaires (N+1 problem).
+\end{itemize}
+Le logging SQL doit être activé pour visualiser la différence.
+
+\subsubsection{AlertRepository.cs}
+
+\textbf{Méthodes métier spécifiques :}
+\begin{itemize}
+  \item \cs{Task<IReadOnlyList<Alert>> GetActiveAlertsAsync(CancellationToken ct)}\\
+        Filtre \cs{IsAcknowledged == false}, tri par \cs{Level} décroissant.
+  \item \cs{Task AcknowledgeAlertAsync(Guid alertId, CancellationToken ct)}\\
+        Met à jour \cs{IsAcknowledged = true} et \cs{AcknowledgedAt = DateTime.UtcNow}.
+        Utilise une mise à jour ciblée (\cs{ExecuteUpdateAsync}) sans charger
+        l'entité entière.
+  \item \cs{Task<IReadOnlyList<Alert>> GetAlertsByLevelAsync(AlertLevel level, CancellationToken ct)}
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{LINQ obligatoire sur toutes les requêtes métier.} Zéro SQL raw sauf
+justification documentée en commentaire XML. Si tu utilises \cs{FromSqlRaw},
+explique pourquoi LINQ ne permettait pas d'exprimer cette requête. \\[4pt]
+\textbf{async/await partout :} toutes les méthodes qui touchent la DB sont
+\cs{async Task<T>}. Interdiction de \cs{.Result} ou \cs{.Wait()}. Utilise
+\cs{ConfigureAwait(false)} dans les méthodes des repositories (couche librairie,
+pas UI).
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Schéma de la base de données}
+
+\begin{center}
+\begin{tabularx}{\textwidth}{>{\ttfamily}l >{\ttfamily}l X}
+\toprule
+\textbf{Table} & \textbf{Colonne} & \textbf{Contrainte / Note} \\
+\midrule
+Instruments & Id (GUID) & Clé primaire, généré automatiquement \\
+            & Ticker & NOT NULL, longueur max 20 \\
+            & ProductType & Enum stocké en string (HasConversion) \\
+            & Strike & REAL nullable \\
+            & Underlying & NOT NULL \\
+            & Currency & Enum stocké en string \\
+            & Maturity & TEXT (DateOnly sérialisé) \\
+\midrule
+Positions & Id (GUID) & Clé primaire \\
+          & InstrumentId & Clé étrangère NOT NULL vers Instruments \\
+          & NetQuantity & INTEGER \\
+          & Status & Enum (Active / Closed) en string \\
+          & OpenDate & TEXT (DateTimeOffset) \\
+\midrule
+Trades & TradeId (GUID) & Clé primaire \\
+       & InstrumentId & Clé étrangère NOT NULL \\
+       & Notional & REAL NOT NULL \\
+       & Quantity & INTEGER NOT NULL \\
+       & TradePrice & REAL NOT NULL \\
+       & TradeDate & TEXT (DateTimeOffset ISO8601) \\
+       & Desk & NOT NULL, longueur max 50 \\
+       & Trader & NOT NULL \\
+\midrule
+MarketData & Id (GUID) & Clé primaire \\
+           & InstrumentId & Clé étrangère \\
+           & SpotPrice & REAL NOT NULL \\
+           & ImpliedVolatility & REAL \\
+           & RiskFreeRate & REAL \\
+           & Timestamp & TEXT (DateTimeOffset) \\
+           & Source & NOT NULL \\
+\midrule
+PnLHistory & Id (GUID) & Clé primaire \\
+           & PositionId & Clé étrangère, cascade delete \\
+           & DailyPnL & REAL \\
+           & MTD & REAL \\
+           & YTD & REAL \\
+           & GreeksJson & TEXT (serialisé JSON) \\
+           & Date & TEXT (DateOnly) \\
+\midrule
+Alerts & Id (GUID) & Clé primaire \\
+       & Level & Enum en string \\
+       & Message & TEXT NOT NULL \\
+       & PositionId & Clé étrangère nullable (SetNull) \\
+       & TriggeredAt & TEXT (DateTimeOffset) \\
+       & IsAcknowledged & INTEGER (bool) \\
+       & AcknowledgedAt & TEXT nullable \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+
+\newpage
+% ------------------------------------------------------------
+\section{Tests unitaires associés}
+% ------------------------------------------------------------
+
+\subsection{Tests pour .Data}
+
+\begin{itemize}
+  \item \textbf{TradeRepositoryTests} : CRUD complet sur SQLite in-memory
+        (\cs{UseInMemoryDatabase}). Vérification que \cs{GetTradesByDeskAsync}
+        filtre correctement.
+  \item \textbf{PositionRepositoryTests} : vérifier le cascade delete sur
+        PnLSnapshot. Vérifier que \cs{GetOpenPositionsAsync} n'inclut pas les
+        positions closes.
+  \item \textbf{AlertRepositoryTests} : vérifier que \cs{AcknowledgeAlertAsync}
+        ne déclenche pas de chargement complet de l'entité (utiliser le logging EF
+        pour compter les requêtes SQL).
+\end{itemize}
+
+\subsection{Tests pour .Risk}
+
+\begin{itemize}
+  \item \textbf{MonteCarloEngineTests} : prix MC dans $\pm 2\%$ du prix BS pour
+        100\,000 chemins. Test de convergence : vérifier que l'erreur standard
+        diminue en $1/\sqrt{N}$.
+  \item \textbf{PnLEngineTests} : simuler un mouvement spot de $+1\%$ et vérifier
+        que le PnL Daily d'une position longue call est positif et cohérent avec
+        le Delta.
+  \item \textbf{LimitCheckerTests} : vérifier le franchissement exact du seuil,
+        l'absence de doublon d'alerte, la persistance via \cs{Mock<IRepository<Alert>>}.
+  \item \textbf{StressTestEngineTests} : vérifier que tous les scénarios tournent
+        en parallèle (mesurer que le temps total est inférieur à la somme des
+        temps individuels).
+\end{itemize}
+
+\newpage
+
+% ------------------------------------------------------------
+\section{TradingDashboard.Reports}
+% ------------------------------------------------------------
+
+\begin{tcolorbox}[note]
+Ce projet produit les exports de risque journaliers en Excel (EPPlus) et PDF
+(QuestPDF). Il consomme les données via les interfaces \cs{IRepository<T>}
+et le \cs{PnLEngine}. Aucune logique de calcul ici -- uniquement mise en forme
+et export.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{ExcelReporter.cs -- Export Excel}
+
+\textbf{Rôle} : générer un classeur Excel multi-onglets représentant
+l'état complet du portefeuille. Utilise \textbf{EPPlus} (licence
+NonCommercial gratuite pour usage éducatif).
+
+\textbf{Implémente} \cs{IDisposable} -- le \cs{ExcelPackage} EPPlus doit
+être libéré dans \cs{Dispose()}.
+
+\textbf{Onglets à générer :}
+
+\textbf{Onglet 1 -- Positions :}
+\begin{itemize}
+  \item Colonnes : Ticker, ProductType, NetQuantity, Strike, Maturity,
+        DaysToMaturity, Currency, Status.
+  \item Mise en forme : en-têtes en gras avec fond vert foncé (\texttt{\#008264}),
+        lignes alternées gris clair, filtre automatique activé.
+  \item Tri : par DaysToMaturity croissant (positions proche échéance en premier).
+  \item Formule Excel générée programmatiquement : colonne
+        ``Valeur Notionnelle EUR'' = \texttt{=NetQuantity * Strike}.
+\end{itemize}
+
+\textbf{Onglet 2 -- PnL History :}
+\begin{itemize}
+  \item Colonnes : Date, Ticker, DailyPnL, MTD, YTD, Delta, Vega, Theta.
+  \item Mise en forme conditionnelle : DailyPnL en rouge si négatif, en
+        vert si positif (via \cs{ExcelConditionalFormattingIconDataBar}).
+  \item Ligne de total en bas : somme des colonnes numériques via formule
+        \texttt{SUM} générée dynamiquement.
+\end{itemize}
+
+\textbf{Onglet 3 -- Greeks :}
+\begin{itemize}
+  \item Tableau des Greeks par position et Greeks agrégés du portefeuille.
+  \item Graphique en barres : Delta net par sous-jacent, généré
+        programmatiquement via \cs{ExcelChart}.
+\end{itemize}
+
+\textbf{Méthodes :}
+\begin{itemize}
+  \item \cs{Task<byte[]> GenerateReportAsync(PortfolioPnL portfolio, CancellationToken ct = default)}\\
+        Retourne le fichier Excel en mémoire (byte array). Pas d'écriture
+        disque directe -- l'appelant décide où sauvegarder.
+  \item \cs{Task SaveToFileAsync(byte[] content, string path, CancellationToken ct = default)}
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{IDisposable et using :} \cs{ExcelReporter} implémente
+\cs{IDisposable}. Partout où il est instancié manuellement, il doit
+être dans un bloc \cs{using}. L'\cs{ExcelPackage} interne doit être
+libéré dans \cs{Dispose()} même si \cs{GenerateReportAsync}
+n'a pas été appelé. \\[4pt]
+\textbf{LINQ pour la préparation des données :} toutes les
+transformations (tri, filtrage, projection vers les colonnes Excel) doivent
+être en LINQ. Pas de boucle \cs{foreach} pour construire les tableaux de
+données.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{PdfReporter.cs -- Export PDF}
+
+\textbf{Rôle} : générer un rapport de risque journalier mis en page
+via \textbf{QuestPDF} (open-source, licence MIT pour usage éducatif).
+
+\textbf{Implémente} \cs{IDisposable}.
+
+\textbf{Structure du rapport PDF :}
+\begin{enumerate}
+  \item \textbf{Page de garde} : titre ``Rapport de
+        Risque Journalier'', date de génération, période couverte.
+  \item \textbf{Résumé exécutif} (1 page) : PnL Daily total,
+        PnL MTD, PnL YTD, Greeks agrégés du portefeuille, nombre
+        d'alertes actives. Mise en forme tabulée avec code couleur
+        vert/rouge selon signe du PnL.
+  \item \textbf{Détail par position} (N pages) : une section par position
+        active avec : identité de l'instrument, Greeks individuels, historique
+        PnL sur 30 jours en tableau.
+  \item \textbf{Alertes actives} : tableau des alertes non acquittées trié
+        par sévérité décroissante.
+  \item \textbf{Stress Test Summary} : matrice des impacts PnL par scénario
+        (si les résultats sont disponibles).
+\end{enumerate}
+
+\textbf{Méthodes :}
+\begin{itemize}
+  \item \cs{Task<byte[]> GenerateReportAsync(PortfolioPnL portfolio, IReadOnlyList<Alert> alerts, CancellationToken ct = default)}
+  \item \cs{Task SaveToFileAsync(byte[] content, string path, CancellationToken ct = default)}
+\end{itemize}
+
+\begin{tcolorbox}[note]
+QuestPDF utilise un modèle de composition déclaratif (similaire à
+Jetpack Compose ou SwiftUI) : tu décris le document en C\# pur via des
+méthodes chaînées (\cs{.Row()}, \cs{.Column()},
+\cs{.Table()}). C'est un exercice d'utilisation d'une API fluent -- pattern
+Builder appliqué à la génération de documents.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{ReportScheduler.cs -- Planification}
+
+\textbf{Rôle} : déclencher la génération automatique des rapports
+à heure fixe (17h00 heure de Paris, fin de journée de trading).
+
+\textbf{Implémentation :}
+\begin{itemize}
+  \item Utilise \cs{PeriodicTimer} pour vérifier toutes les minutes si
+        l'heure de génération est atteinte.
+  \item Génère Excel et PDF en parallèle via
+        \cs{Task.WhenAll(excelTask, pdfTask)}.
+  \item Sauvegarde les fichiers dans un dossier \cs{./reports/YYYY-MM-DD/}.
+  \item Log la durée de génération et la taille des fichiers produits.
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{CancellationToken propagé :} \cs{ReportScheduler} accepte un
+\cs{CancellationToken} dans sa méthode \cs{StartAsync}. Quand le token
+est annulé (arrêt de l'application), la boucle se termine proprement sans
+exception non gérée. Utilise \cs{PeriodicTimer.WaitForNextTickAsync(ct)}
+qui lance une \cs{OperationCanceledException} que tu catches pour sortir
+proprement.
+\end{tcolorbox}
+
+\newpage
+
+% ------------------------------------------------------------
+\section{TradingDashboard.Dashboard}
+% ------------------------------------------------------------
+
+\begin{tcolorbox}[note]
+C'est le point d'entrée de l'application (\cs{Program.cs}). Il orchestre
+tous les modules, configure l'injection de dépendances, et affiche l'état
+du portefeuille en temps réel dans le terminal. C'est une \textbf{Console App}
+\cs{.NET 8}.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Program.cs -- Point d'entrée et DI}
+
+\textbf{Rôle} : configurer le conteneur d'injection de dépendances
+(\cs{ServiceCollection}), démarrer les services et lancer la boucle
+d'affichage.
+
+\textbf{Enregistrements DI attendus :}
+\begin{itemize}
+  \item \cs{AddDbContext<TradingDbContext>} -- cycle de vie \cs{Scoped}.
+  \item \cs{AddScoped<IRepository<Trade>, TradeRepository>}
+  \item \cs{AddScoped<IRepository<Position>, PositionRepository>}
+  \item \cs{AddScoped<IRepository<Alert>, AlertRepository>}
+  \item \cs{AddSingleton<IMarketDataFeed, MarketDataService>}
+  \item \cs{AddSingleton<IPricer<VanillaOption, PricingResult>, BlackScholesPricer>}
+  \item \cs{AddSingleton<PnLEngine>}
+  \item \cs{AddSingleton<LimitChecker>}
+  \item \cs{AddSingleton<MarketDataCache>}
+  \item \cs{AddHttpClient<AlphaVantageClient>} avec politique Polly attachée.
+\end{itemize}
+
+\textbf{Séquence de démarrage :}
+\begin{enumerate}
+  \item Appliquer les migrations EF Core en attente (\cs{context.Database.MigrateAsync()}).
+  \item Injecter des données de test si la base est vide (seed data :
+        5 instruments, 10 trades répartis sur 2 desks).
+  \item Démarrer le \cs{SimulatedMarketDataFeed} (ou l'API réelle selon
+        la configuration).
+  \item Abonner \cs{PnLEngine} au feed.
+  \item Abonner \cs{LimitChecker} au \cs{PnLEngine}.
+  \item Lancer la boucle d'affichage console.
+\end{enumerate}
+
+\begin{tcolorbox}[constraint]
+\textbf{Top-level statements :} \cs{Program.cs} doit utiliser les top-level
+statements (C\# 9+). Pas de classe \cs{Program} explicite ni de méthode
+\cs{Main}. Sache expliquer ce que le compilateur génère derrière
+cette syntaxe. \\[4pt]
+\textbf{CancellationToken global :} créer un \cs{CancellationTokenSource}
+principal relié à \cs{Console.CancelKeyPress} (Ctrl+C). Ce token est
+propagé à tous les services au démarrage. L'arrêt doit être
+propre~: flush du PnL, sauvegarde en base, fermeture du feed.
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{ConsoleRenderer.cs -- Affichage temps réel}
+
+\textbf{Rôle} : rafraîchir l'affichage console toutes les secondes avec
+l'état courant du portefeuille. Utilise \cs{Console.SetCursorPosition} pour
+éviter le scroll (affichage en place fixe).
+
+\textbf{Sections à afficher :}
+
+\textbf{Section 1 -- En-tête :}
+\begin{itemize}
+  \item Heure courante, version de l'application, statut du feed
+        (Connected / Simulated / Error).
+  \item Barre de séparation horizontale.
+\end{itemize}
+
+\textbf{Section 2 -- PnL Summary :}
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Desk} & \textbf{Daily PnL} & \textbf{MTD} & \textbf{YTD} \\
+\midrule
+DERIV-EU-01 & +12 450 EUR & +87 200 EUR & +342 000 EUR \\
+Portfolio Total & +12 450 EUR & +87 200 EUR & +342 000 EUR \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Couleur : vert (\cs{ConsoleColor.Green}) si positif, rouge
+(\cs{ConsoleColor.Red}) si négatif. Utilise \cs{Console.ForegroundColor}
+et restaure-le après chaque ligne.
+
+\textbf{Section 3 -- Greeks agrégés :}
+\begin{itemize}
+  \item Delta net, Gamma net, Vega net, Theta du portefeuille.
+  \item Alerte visuelle (\cs{[!]}) si un Greek dépasse sa limite.
+\end{itemize}
+
+\textbf{Section 4 -- Blotter de positions :}
+\begin{itemize}
+  \item Tableau des positions actives : Ticker, Type, Qty, Strike, DaysToMaturity,
+        Prix Théorique, Delta, PnL Daily.
+  \item Tri par DaysToMaturity croissant via LINQ (\cs{.OrderBy}).
+  \item Positions proches de l'échéance ($<$ 5 jours) affichées en
+        jaune (\cs{ConsoleColor.Yellow}).
+\end{itemize}
+
+\textbf{Section 5 -- Queue d'alertes :}
+\begin{itemize}
+  \item Les 5 dernières alertes actives triées par sévérité
+        décroissante via \cs{PriorityQueue<Alert, AlertLevel>}.
+  \item Alertes \cs{Critical} et \cs{Fatal} en rouge clignotant (simulé
+        via alternance d'affichage).
+\end{itemize}
+
+\begin{tcolorbox}[constraint]
+\textbf{SortedDictionary et PriorityQueue :} l'historique PnL des 60 derniers
+ticks doit être stocké dans un
+\cs{SortedDictionary<DateTimeOffset, PortfolioPnL>} (accès trié
+chronologiquement, O(log n) en insertion). La queue d'alertes utilise
+\cs{PriorityQueue<Alert, AlertLevel>} (min-heap). Pour avoir les alertes
+les plus critiques en premier, inverse la comparaison via un
+\cs{IComparer<AlertLevel>} personnalisé. \\[4pt]
+\textbf{LinkedList comme circular buffer :} les snapshots de marché en
+mémoire (1000 derniers) sont stockés dans une
+\cs{LinkedList<MarketSnapshot>}. Quand la taille dépasse 1000,
+supprime le premier élément (\cs{RemoveFirst()}) avant d'ajouter le
+nouveau (\cs{AddLast()}). Sache expliquer pourquoi \cs{LinkedList} est
+préférable à \cs{List<T>} pour ce pattern (O(1) en ajout/suppression
+aux extrémités).
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Configuration/ -- Paramètres de l'application}
+
+\textbf{Fichier} \cs{appsettings.json} à créer à la racine du projet
+Dashboard. Doit contenir :
+
+\begin{itemize}
+  \item \cs{AlphaVantage:ApiKey} -- clé API (ne jamais committer en clair,
+        utiliser \cs{dotnet user-secrets} pour le développement local).
+  \item \cs{MarketData:CacheExpirySeconds} -- durée de vie du cache (30 par
+        défaut).
+  \item \cs{MarketData:UseSimulation} -- bool. Si true, utilise
+        \cs{SimulatedMarketDataFeed} au lieu de l'API réelle.
+  \item \cs{Risk:DailyLossLimit} -- seuil en EUR (-50000 par défaut).
+  \item \cs{Risk:DeltaLimit}, \cs{Risk:VegaLimit}.
+  \item \cs{Dashboard:RefreshIntervalMs} -- intervalle de rafraîchissement
+        console (1000 par défaut).
+\end{itemize}
+
+\newpage
+
+% ------------------------------------------------------------
+\section{TradingDashboard.Tests}
+% ------------------------------------------------------------
+
+\begin{tcolorbox}[note]
+Projet transversal xUnit couvrant tous les modules. La couverture minimale
+requise est 70\% sur les projets \texttt{Pricing} et \texttt{Risk}. Ce projet
+référence tous les autres projets (sauf \texttt{Dashboard}).
+\end{tcolorbox}
+
+% ------------------------------------------------------------
+\subsection{Pricing/ -- Tests du moteur de pricing}
+
+\subsubsection{BlackScholesTests.cs}
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Prix call ATM} : $S=100$, $K=100$, $\sigma=20\%$, $r=5\%$,
+        $T=1$ an. Résultat attendu : $\approx 10.45$. Tolérance : $\pm 0.01$.
+  \item \textbf{Put-Call Parity} : vérifier que
+        $C - P = S \cdot e^{-qT} - K \cdot e^{-rT}$ à $10^{-6}$ près
+        pour tout jeu de paramètres.
+  \item \textbf{Delta call deep ITM} : $S=150$, $K=100$, $T=0.1$. Delta doit
+        être $> 0.99$.
+  \item \textbf{Delta call deep OTM} : $S=50$, $K=100$, $T=0.1$. Delta doit
+        être $< 0.01$.
+  \item \textbf{Gamma toujours positif} : vérifier sur 20 jeux de paramètres
+        aléatoires (propriété-based testing avec une boucle paramétrique
+        xUnit via \cs{[Theory][InlineData]}).
+  \item \textbf{Theta négatif} : pour une position longue, Theta doit être
+        négatif (décroissance de la valeur temporelle).
+  \item \textbf{Vega positif} : Vega est toujours positif pour un call ou un put
+        long (une hausse de vol augmente la valeur de l'option).
+\end{itemize}
+
+\subsubsection{MonteCarloValidationTests.cs}
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Convergence vers Black-Scholes} : prix MC à $\pm 2\%$ du
+        prix BS pour 100\,000 chemins. Paramètres identiques aux tests BS.
+  \item \textbf{Décroissance de l'erreur standard} : vérifier que
+        $\text{StdError}(N=100\,000) < \text{StdError}(N=10\,000)$.
+  \item \textbf{Speedup mesurable} : le mode parallèle doit être au moins
+        1.5x plus rapide que le mode séquentiel pour 500\,000 chemins sur une
+        machine multi-coeurs. Ce test peut être marqué
+        \cs{[Fact(Skip = "Performance test -- run manually")]} pour ne pas
+        alourdir la CI.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{Data/ -- Tests de la couche de persistance}
+
+\subsubsection{TradeRepositoryTests.cs}
+
+\textbf{Setup} : utiliser \cs{UseInMemoryDatabase("TestDb\_" + Guid.NewGuid())}
+pour isoler chaque test.
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item CRUD complet : Add, GetById, Update, Delete sur un Trade.
+  \item \cs{GetTradesByDeskAsync} : insérer 10 trades sur 2 desks, vérifier
+        que le filtre retourne exactement les trades du bon desk.
+  \item \cs{GetTotalNotionalByDeskAsync} : vérifier l'agrégation
+        arithmétique sur des données connues.
+  \item Trade inexistant : \cs{GetByIdAsync} avec un Guid aléatoire doit
+        retourner \cs{null} sans exception.
+\end{itemize}
+
+\subsubsection{PositionRepositoryTests.cs}
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \cs{GetOpenPositionsAsync} ne retourne pas les positions avec statut
+        \cs{Closed}.
+  \item Cascade delete : supprimer une Position doit supprimer ses
+        \cs{PnLSnapshot} associés.
+  \item \cs{GetAggregatedGreeksAsync} : vérifier la somme sur 3 positions
+        avec des Greeks connus.
+\end{itemize}
+
+\subsubsection{AlertRepositoryTests.cs}
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \cs{AcknowledgeAlertAsync} : vérifier que \cs{IsAcknowledged}
+        passe à true et que \cs{AcknowledgedAt} est renseigné.
+  \item \cs{GetActiveAlertsAsync} : une alerte acquittée ne doit pas
+        apparaître dans les actives.
+  \item Tri par sévérité : vérifier que la première alerte
+        retournée est bien la plus critique.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{Risk/ -- Tests du moteur de risque}
+
+\subsubsection{PnLEngineTests.cs}
+
+\textbf{Setup} : mocker \cs{IRepository<Position>} et
+\cs{IPricer<VanillaOption, PricingResult>} via Moq.
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Mouvement spot positif} : simuler un snapshot avec spot
+        $+1\%$. Le PnL Daily d'une position longue call doit être positif.
+        Cohérence avec Delta : $\Delta PnL \approx \Delta \times \Delta S \times Q$.
+  \item \textbf{Mouvement spot négatif} : position longue call, spot $-1\%$,
+        PnL Daily négatif.
+  \item \textbf{Position short call} : Quantity $< 0$, spot $+1\%$, PnL Daily
+        négatif (position courte perd quand le marché monte).
+  \item \textbf{OnError ne propage pas} : appeler \cs{OnError} ne doit pas
+        faire planter la boucle d'observation.
+\end{itemize}
+
+\subsubsection{LimitCheckerTests.cs}
+
+\textbf{Setup} : \cs{Mock<IRepository<Alert>>} pour capturer les alertes
+persistees.
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Franchissement exact} : PnL Daily à -49\,999 EUR -- pas
+        d'alerte. PnL Daily à -50\,001 EUR -- exactement 1 alerte
+        \cs{Critical} persistee.
+  \item \textbf{Pas de doublon} : deux ticks consécutifs en dessous de la
+        limite ne doivent provoquer qu'une seule alerte (pas de duplication).
+  \item \textbf{Reset après retour en zone normale} : si le PnL remonte
+        au-dessus de la limite puis redescend, une nouvelle alerte doit être
+        émise (le système a ``reseté'' son état).
+  \item \textbf{Delta limit} : vérifier le déclenchement de l'alerte
+        Warning sur le Delta net.
+\end{itemize}
+
+\subsubsection{StressTestEngineTests.cs}
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Parallélisme mesurable} : le temps total de
+        \cs{RunAllScenariosAsync} doit être inférieur à la somme
+        des temps individuels (marge de 20\%).
+  \item \textbf{CombinedShock plus sevère} : le PnL impact du
+        CombinedShock doit être inférieur (plus négatif) à
+        celui du SpotShock seul pour une position longue call.
+  \item \textbf{IProgress reporté} : vérifier que le nombre de
+        notifications \cs{IProgress} reçues est égal au nombre de
+        scénarios exécutés.
+  \item \textbf{Annulation propre} : annuler le \cs{CancellationToken} en
+        cours d'exécution ne doit pas lever d'exception non gérée.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{MarketData/ -- Tests du client API}
+
+\subsubsection{MarketDataServiceTests.cs}
+
+\textbf{Setup} : mocker \cs{HttpMessageHandler} pour simuler les réponses
+Alpha Vantage sans appel réseau réel.
+
+\textbf{Cas de test obligatoires :}
+\begin{itemize}
+  \item \textbf{Cache hit} : deux appels successifs pour le même ticker dans
+        la fenêtre d'expiry ne doivent générer qu'un seul appel HTTP.
+        Vérifier via \cs{Mock<HttpMessageHandler>} que \cs{SendAsync}
+        n'est appelée qu'une fois.
+  \item \textbf{Cache miss après expiry} : après expiration du cache
+        (manipuler le temps via une interface \cs{ITimeProvider}), un second
+        appel doit déclencher un nouvel appel HTTP.
+  \item \textbf{Rate limit} : simuler 6 appels simultanés et vérifier que
+        le 6ème attend que le token bucket se recharge.
+  \item \textbf{HttpRequestException} : simuler une erreur réseau et vérifier
+        que l'exception remonte correctement (pas catchée silencieusement).
+  \item \textbf{Désérialisation} : vérifier que les string numériques
+        Alpha Vantage (\texttt{"182.4500"}) sont correctement converti en
+        \cs{decimal}.
+\end{itemize}
+
+% ------------------------------------------------------------
+\subsection{Contraintes générales du projet Tests}
+
+\begin{tcolorbox}[constraint]
+\textbf{FluentAssertions obligatoire :} toutes les assertions utilisent
+FluentAssertions. Exemples attendus :
+\cs{result.Should().BeApproximately(expected, 0.01)},
+\cs{alerts.Should().HaveCount(1)},
+\cs{action.Should().NotThrow()},
+\cs{result.Should().BeNull()}. \\
+Interdiction de \cs{Assert.Equal}, \cs{Assert.True} bruts. \\[4pt]
+\textbf{Moq pour toutes les dépendances externes :} aucun accès réseau
+réel dans les tests unitaires. Toute dépendance vers DB, API ou système
+de fichiers est mockée. Les tests d'intégration (SQLite in-memory)
+sont dans des classes séparées suffixees \cs{IntegrationTests}. \\[4pt]
+\textbf{Tests async corrects :} toutes les méthodes de test qui appellent du
+code async sont \cs{async Task} (jamais \cs{async void}). Toujours
+\cs{await} dans le corps du test, jamais \cs{.Result}. \\[4pt]
+\textbf{Isolation des tests :} chaque test est indépendant. Pas d'état
+partagé entre tests. La base in-memory utilise un nom unique par test
+(\cs{Guid.NewGuid()}). Les mocks sont recréés dans chaque méthode
+ou dans le constructeur de la classe de test (pas de static).
+\end{tcolorbox}
+
+\newpage
+% ------------------------------------------------------------
+\section{Références entre projets -- Vue complète}
+% ------------------------------------------------------------
+
+\begin{center}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Projet} & \textbf{Dépend de} & \textbf{Packages NuGet} \\
+\midrule
+.Core & -- & Aucun \\
+.Pricing & .Core & Aucun \\
+.Data & .Core & EF Core 8, EF Core SQLite \\
+.MarketData & .Core, .Pricing & Polly, System.Text.Json \\
+.Risk & .Core, .Pricing & Aucun \\
+.Reports & .Core, .Risk & EPPlus, QuestPDF \\
+.Dashboard & Tous sauf .Tests & Microsoft.Extensions.DependencyInjection, Hosting \\
+.Tests & Tous sauf .Dashboard & xUnit, Moq, FluentAssertions, EF Core InMemory \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{tcolorbox}[note]
+La règle fondamentale de dépendance : \textbf{jamais de référence
+circulaire}. \texttt{Core} ne connaît aucun autre projet. \texttt{Dashboard}
+est le seul à avoir une vue globale. Tous les modules communiquent entre eux
+via les interfaces définies dans \texttt{Core}. C'est la Clean Architecture
+appliquée à un système financier.
+\end{tcolorbox}
+
+\end{document}

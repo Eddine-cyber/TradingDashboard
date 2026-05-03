@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Principal;
@@ -27,10 +27,10 @@ namespace TradingDashbord.Pricing.BlackScholes
             if (! (this.SupportedProduct == instrument.ProductType))
                 throw new Exception("the instrument typed is not the one supported by the pricer");
             // instrument.Strike is not null because we know that instrument is an option
-            double D1 = MathExtensions.d1(SnapShot.SpotPrice, instrument.Strike.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity);
-            double D2 = MathExtensions.d2(SnapShot.SpotPrice, instrument.Strike.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity);
-            double CallPrice = SnapShot.SpotPrice * D1.NormalCDF() - instrument.Strike.Value*Math.Exp(-SnapShot.RiskFreeRate * instrument.YearsToMaturity) * D2.NormalCDF();
-            return (this.SupportedProduct == ProductType.Call) ? Task.FromResult(CallPrice) : Task.FromResult(CallPrice - SnapShot.SpotPrice + instrument.Strike.Value*Math.Exp(-SnapShot.RiskFreeRate* instrument.YearsToMaturity));
+            double D1 = MathExtensions.d1(SnapShot.SpotPrice, instrument.StrikeOrNull!.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity);
+            double D2 = MathExtensions.d2(SnapShot.SpotPrice, instrument.StrikeOrNull!.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity);
+            double CallPrice = SnapShot.SpotPrice * D1.NormalCDF() - instrument.StrikeOrNull!.Value*Math.Exp(-SnapShot.RiskFreeRate * instrument.YearsToMaturity) * D2.NormalCDF();
+            return (this.SupportedProduct == ProductType.Call) ? Task.FromResult(CallPrice) : Task.FromResult(CallPrice - SnapShot.SpotPrice + instrument.StrikeOrNull!.Value*Math.Exp(-SnapShot.RiskFreeRate* instrument.YearsToMaturity));
         }
 
         public async Task<PricingResult> CalculatePrice(Instrument instrument, MarketSnapshot SnapShot)
@@ -42,7 +42,7 @@ namespace TradingDashbord.Pricing.BlackScholes
 
         public Task<Greeks> CalculateGreeks(Instrument instrument, MarketSnapshot SnapShot)
         {
-            return Task.FromResult(GreeksCalculator.Compute(instrument.ProductType, SnapShot.SpotPrice, instrument.Strike.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity));
+            return Task.FromResult(GreeksCalculator.Compute(instrument.ProductType, SnapShot.SpotPrice, instrument.StrikeOrNull!.Value, SnapShot.RiskFreeRate, SnapShot.ImpliedVolatility, instrument.YearsToMaturity));
         }
         public ProductType SupportedProduct { get => _supportedproduct;}
 

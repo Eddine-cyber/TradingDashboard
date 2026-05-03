@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TradingDashboard.Core.Enums;
@@ -13,10 +13,10 @@ namespace TradingDashbord.Pricing.MonteCarlo
         {
             return instrument.ProductType switch
             {
-                ProductType.AsianCall => new ArithmeticAsianCallPayoff(instrument!.Strike.Value, instrument!.ObservationCount.Value),
-                ProductType.AsianPut => new ArithmeticAsianPutPayoff(instrument!.Strike.Value, instrument!.ObservationCount.Value),
-                ProductType.LookbackCall => new LookbackFixedStrikeCallPayoff(instrument!.Strike.Value),
-                ProductType.LookbackPut => new LookbackFixedStrikePutPayoff(instrument!.Strike.Value),
+                ProductType.AsianCall    => new ArithmeticAsianCallPayoff(instrument.StrikeOrNull!.Value, instrument.ObservationCountOrNull!.Value),
+                ProductType.AsianPut     => new ArithmeticAsianPutPayoff(instrument.StrikeOrNull!.Value, instrument.ObservationCountOrNull!.Value),
+                ProductType.LookbackCall => new LookbackFixedStrikeCallPayoff(instrument.StrikeOrNull!.Value),
+                ProductType.LookbackPut  => new LookbackFixedStrikePutPayoff(instrument.StrikeOrNull!.Value),
                 _ => throw new ArgumentException($"PayoffFactory cannot be instancieted by {instrument.ProductType}")
             };
         }

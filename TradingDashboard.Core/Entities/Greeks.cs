@@ -43,9 +43,21 @@ namespace TradingDashboard.Core.Entities
             first.Vega += second.Vega;
             first.Theta += second.Theta;
             first.Rho += second.Rho;
-            first.CalculatedAt = DateTime.Now;
+            first.CalculatedAt = DateTimeOffset.UtcNow;
 
             return first;
+        }
+        public static Greeks operator *(int quantity, Greeks greeks)
+        {
+
+            greeks.Delta *= quantity;
+            greeks.Gamma *= quantity;
+            greeks.Vega *= quantity;
+            greeks.Theta *= quantity;
+            greeks.Rho *= quantity;
+            greeks.CalculatedAt = DateTimeOffset.UtcNow;
+
+            return greeks;
         }
 
         public static Greeks Zero()

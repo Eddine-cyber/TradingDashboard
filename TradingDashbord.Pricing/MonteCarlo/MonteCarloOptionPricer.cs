@@ -13,15 +13,11 @@ namespace TradingDashbord.Pricing.MonteCarlo
         private ProductType _supportedproduct;
         public ProductType SupportedProduct { get => _supportedproduct; }
         public IPayoff Payoff { get; init; }
-        public int NumberOfPaths { get; set; }
-        public int Steps { get; init; }
-        public double[] Perturbations { get; init; }
+        public MonteCarloConfig Config { get; set; }
         public MonteCarloOptionPricer(ProductType supportedproduct, IPayoff payoff, MonteCarloConfig _config)
         {
             Payoff = payoff;
-            Steps = _config.Steps;
-            NumberOfPaths = _config.NumberOfPaths;
-            Perturbations = _config.Perturbations ?? [0.01, 0.01, 0.01, 0.01, 1.0]; // Delta, Gamma, Vega, Rho, Theta 
+            Config = _config; 
             if (!supportedproduct.IsOption())
                 throw new Exception("ProductType must be an option");
             _supportedproduct = supportedproduct;
@@ -29,13 +25,13 @@ namespace TradingDashbord.Pricing.MonteCarlo
 
         public async Task<double> CalculatePriceOnly(Instrument instrument, MarketSnapshot snapshot)
         {
-            GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Steps);
+            GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Config.Steps);
             double price = CalculatePriceOnly(simulator, instrument);
             return price;
         }
         public async Task<PricingResult> CalculatePrice(Instrument instrument, MarketSnapshot snapshot)
         {
-            GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Steps);
+            GBMPathSimulator simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Config.Steps);
             var (price, confidenceInterval) = CalculatePriceAndStd(simulator, instrument);
 
             Greeks greeks = await CalculateGreeks(instrument, snapshot);
@@ -44,11 +40,11 @@ namespace TradingDashbord.Pricing.MonteCarlo
         }
         public Task<Greeks> CalculateGreeks(Instrument instrument, MarketSnapshot snapshot)
         {
-            GBMPathSimulator Simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Steps);
+            GBMPathSimulator Simulator = new GBMPathSimulator(snapshot.SpotPrice, snapshot.RiskFreeRate, snapshot.ImpliedVolatility, instrument.YearsToMaturity, Config.Steps);
             // Delta & Gamma — bump on Spot
-            double h_spot = Simulator.Spot * Perturbations[0];
-            GBMPathSimulator sim_spot_left = new(Simulator.Spot - h_spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears, Simulator.Steps);
-            GBMPathSimulator sim_spot_right = new(Simulator.Spot + h_spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears, Simulator.Steps);
+            double h_spot = Simulator.Spot * Config.Perturbations[0];
+            GBMPathSimulator sim_spot_left = new(Simulator.Spot - h_spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears, Config.Steps);
+            GBMPathSimulator sim_spot_right = new(Simulator.Spot + h_spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears, Config.Steps);
 
             double price_left = CalculatePriceOnly(sim_spot_left, instrument);
             double price_right = CalculatePriceOnly(sim_spot_right, instrument);
@@ -58,23 +54,23 @@ namespace TradingDashbord.Pricing.MonteCarlo
             double Gamma = (price_right - 2 * price_center + price_left) / (h_spot * h_spot);
 
             // Vega — bump on Vol
-            double h_vol = Perturbations[2];
-            GBMPathSimulator sim_vol_left = new(Simulator.Spot, Simulator.Rate, Simulator.Vol - h_vol, Simulator.MaturityInYears, Simulator.Steps);
-            GBMPathSimulator sim_vol_right = new(Simulator.Spot, Simulator.Rate, Simulator.Vol + h_vol, Simulator.MaturityInYears, Simulator.Steps);
+            double h_vol = Config.Perturbations[2];
+            GBMPathSimulator sim_vol_left = new(Simulator.Spot, Simulator.Rate, Simulator.Vol - h_vol, Simulator.MaturityInYears, Config.Steps);
+            GBMPathSimulator sim_vol_right = new(Simulator.Spot, Simulator.Rate, Simulator.Vol + h_vol, Simulator.MaturityInYears, Config.Steps);
 
             double Vega = (CalculatePriceOnly(sim_vol_right, instrument) - CalculatePriceOnly(sim_vol_left, instrument)) / (2 * h_vol);
 
             // Rho — bump on Rate
-            double h_rate = Perturbations[3];
-            GBMPathSimulator sim_rate_left = new(Simulator.Spot, Simulator.Rate - h_rate, Simulator.Vol, Simulator.MaturityInYears, Simulator.Steps);
-            GBMPathSimulator sim_rate_right = new(Simulator.Spot, Simulator.Rate + h_rate, Simulator.Vol, Simulator.MaturityInYears, Simulator.Steps);
+            double h_rate = Config.Perturbations[3];
+            GBMPathSimulator sim_rate_left = new(Simulator.Spot, Simulator.Rate - h_rate, Simulator.Vol, Simulator.MaturityInYears, Config.Steps);
+            GBMPathSimulator sim_rate_right = new(Simulator.Spot, Simulator.Rate + h_rate, Simulator.Vol, Simulator.MaturityInYears, Config.Steps);
 
             double Rho = (CalculatePriceOnly(sim_rate_right, instrument) - CalculatePriceOnly(sim_rate_left, instrument)) / (2 * h_rate);
 
             // Theta — bump on Maturity (on instrument, not on simulator)
-            int h_days = (int)Perturbations[4];
-            GBMPathSimulator sim_T_left = new(Simulator.Spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears - h_days / 365.0, Simulator.Steps);
-            GBMPathSimulator sim_T_right = new(Simulator.Spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears + h_days / 365.0, Simulator.Steps);
+            int h_days = (int)Config.Perturbations[4];
+            GBMPathSimulator sim_T_left = new(Simulator.Spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears - h_days / 365.0, Config.Steps);
+            GBMPathSimulator sim_T_right = new(Simulator.Spot, Simulator.Rate, Simulator.Vol, Simulator.MaturityInYears + h_days / 365.0, Config.Steps);
 
             double Theta = -(CalculatePriceOnly(sim_T_right, instrument) - CalculatePriceOnly(sim_T_left, instrument)) / (2 * h_days / 365.0);
 
@@ -92,14 +88,14 @@ namespace TradingDashbord.Pricing.MonteCarlo
             double price = mean * actualisationRate;
 
             double std_diviation = 0.0;
-            for (int i = 0; i < NumberOfPaths; i++)
+            for (int i = 0; i < Config.NumberOfPaths ; i++)
             {
                 std_diviation += (payoffs[i] - mean) * (payoffs[i] - mean);
             }
-            std_diviation /= (NumberOfPaths - 1);
+            std_diviation /= (Config.NumberOfPaths  - 1);
             std_diviation = Math.Sqrt(std_diviation) * actualisationRate;
 
-            double std_error = std_diviation / Math.Sqrt(NumberOfPaths);
+            double std_error = std_diviation / Math.Sqrt(Config.NumberOfPaths );
             double confidenceInterval = 1.96 * std_error;
 
             return (price, confidenceInterval);
@@ -117,9 +113,9 @@ namespace TradingDashbord.Pricing.MonteCarlo
 
         private double[] SimulatePayoffs(GBMPathSimulator simulator)
         {
-            double[][] paths = simulator.SimulatePathsParallel(NumberOfPaths);
-            double[] payoffs = new double[NumberOfPaths];
-            for (int i = 0; i < NumberOfPaths; i++)
+            double[][] paths = simulator.SimulatePathsParallel(Config.NumberOfPaths );
+            double[] payoffs = new double[Config.NumberOfPaths ];
+            for (int i = 0; i < Config.NumberOfPaths ; i++)
     {
                 payoffs[i] = Payoff.Compute(paths[i]);
             }

@@ -11,10 +11,22 @@ namespace TradingDashbord.Pricing.Strategy
     {
         private BlackScholesPricingStrategy _bsStrategy;
         private MonteCarloPricingStrategy _mcStrategy;
+        private MonteCarloConfig _config { get; set; }
+        public MonteCarloConfig Config
+        {
+            get => _config;
+            set
+            {
+                _config = value;
+                _mcStrategy.Config = value;
+            }
+        }
         public PricingEngine(BlackScholesPricingStrategy bs = null, MonteCarloPricingStrategy mc = null, MonteCarloConfig config = null)
         {
             _bsStrategy = bs ?? new BlackScholesPricingStrategy();
+            // we priorities the configuration of MonteCarloPricingStrategy 
             _mcStrategy = mc ?? new MonteCarloPricingStrategy(config);
+            Config = _mcStrategy.Config;
         }
 
         private IPricingStrategy Resolve(Instrument instrument)
