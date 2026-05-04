@@ -6,6 +6,20 @@ Le projet couvre la valorisation d'options (Black-Scholes analytique et Monte Ca
 
 ---
 
+## Statut 
+
+Ce projet est actuellement en cours de développement.
+
+Modules terminés :
+- Core
+- Pricing
+- Risk
+
+En cours :
+- Data/MarketData
+- Reporting
+- Dashboard
+
 ## Architecture
 
 La solution est organisée en 8 projets, les dépendances sont unidirectionnelles (aucune référence circulaire).
