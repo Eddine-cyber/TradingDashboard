@@ -26,26 +26,12 @@ The solution is organized into 8 projects, with unidirectional dependencies.
 |-------------------------------|---------------|-----------------------------------------------------------------|
 | TradingDashboard.Core         | Class Library | Entities, interfaces, enums.                                     |
 | TradingDashboard.Pricing      | Class Library | Black-Scholes, Monte Carlo, Greeks, LV, LS (Heston), LSV (WIP)   |
-| TradingDashboard.Data         | Class Library | Entity Framework Core 8, migrations, Repository pattern.         |
-| TradingDashboard.MarketData   | Class Library | Alpha Vantage client, memory cache, Polly resilience.            |
+| TradingDashboard.Data         | Class Library | Entity Framework Core, migrations, Repository pattern.           |
+| TradingDashboard.MarketData   | Class Library | Alpha Vantage client, memory cache.            |
 | TradingDashboard.Risk         | Class Library | PnL Engine, LimitChecker, StressTestEngine, Observer pattern.    |
 | TradingDashboard.Reports      | Class Library | Excel export via EPPlus, PDF export via QuestPDF.                |
 | TradingDashboard.Dashboard    | Console App   | Entry point, dependency injection, real-time display.            |
 | TradingDashboard.Tests        | xUnit Project | Unit and integration tests                                       |
-
----
-
-## Technical Stack
-
-| Component         | Choice                                             |
-|-------------------|----------------------------------------------------|
-| Language          | C# 12 / .NET 8 LTS                                 |
-| ORM               | Entity Framework Core 8                            |
-| Database          | SQLite                                             |
-| HTTP Resilience   | Polly (exponential retry, circuit breaker)         |
-| Testing           | xUnit, Moq, FluentAssertions                       |
-| Export            | EPPlus (Excel), QuestPDF (PDF)                     |
-| Market Data       | Alpha Vantage API                                  |
 
 ---
 
@@ -79,7 +65,7 @@ The solution is organized into 8 projects, with unidirectional dependencies.
 
 ### Prerequisites
 
-- .NET 8
+- .NET 10 SDK
 - An Alpha Vantage API key ([alphavantage.co](https://www.alphavantage.co))
 
 ### Configuration
