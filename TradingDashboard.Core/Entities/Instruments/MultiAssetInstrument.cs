@@ -1,78 +1,75 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TradingDashboard.Core.Entities.Schedule;
 using TradingDashboard.Core.Enums;
 
 namespace TradingDashboard.Core.Entities.Instruments
 {
     /// <summary>
-    /// Instrument de type basket option : option sur un panier pondéré d'actifs.
-    /// Les actifs peuvent appartenir à des devises différentes.
-    ///
-    /// Payoff basket call :
-    ///   max(Σ w_i * S_i(T) - K, 0)
-    /// Les S_i doivent être convertis dans la devise de règlement (DomesticCurrency).
-    ///
-    /// Non-régression :
-    ///   Hérite de Instrument (existant, inchangé). Ajoute des propriétés sans modifier la base.
-    ///   Le champ Underlying de la base Instrument est utilisé pour le premier actif du panier
-    ///   (backward compat) ; la liste complète est dans BasketComponents.
+    /// Multi-assets instrument (Basket, WorstOf, BestOf, Spread, Outperformance).
     /// </summary>
-    public record BasketInstrument(
+    public record MultiAssetInstrument(
         Guid Id,
         string Ticker,
-        Underlying Underlying,                      // premier composant (compat Instrument de base)
         DateOnly Maturity,
         Currency DomesticCurrency,
-        double Strike,
         ProductType ProductType,
-        IReadOnlyList<BasketComponent> BasketComponents,
+        double Strike,
+        IReadOnlyList<AssetComponent> Components,
         FixingSchedule? Schedule = null)
-        : Instrument(Id, Ticker, Underlying, Maturity, DomesticCurrency, ProductType)
+        : Instrument(Id, Ticker, Maturity, DomesticCurrency, ProductType)
     {
-        public static BasketInstrument Create(
+        public override double? StrikeOrNull => Strike;
+
+        public override IEnumerable<string> GetTickers()
+        {
+            return Components.Select(c => c.Underlying.Name);
+        }
+
+        public static MultiAssetInstrument Create(
             string ticker,
-            Underlying primaryUnderlying,
             DateOnly maturity,
             Currency domesticCurrency,
-            double strike,
             ProductType productType,
-            IReadOnlyList<BasketComponent> components,
+            double strike,
+            IReadOnlyList<AssetComponent> components,
             FixingSchedule? schedule = null,
             Guid id = default)
         {
-            var inst = new BasketInstrument(
+            var inst = new MultiAssetInstrument(
                 id == Guid.Empty ? Guid.NewGuid() : id,
-                ticker, primaryUnderlying, maturity, domesticCurrency,
-                strike, productType, components, schedule);
+                ticker, maturity, domesticCurrency,
+                productType, strike, components, schedule);
             inst.Validate();
             return inst;
         }
 
         public override void Validate()
         {
-            if (ProductType != ProductType.BasketCall && ProductType != ProductType.BasketPut)
-                throw new ArgumentException("ProductType must be BasketCall or BasketPut.");
-            if (Strike < 0)
-                throw new ArgumentException("Strike must be non-negative.");
-            if (BasketComponents.Count < 2)
-                throw new ArgumentException("A basket must have at least 2 components.");
-            double weightSum = BasketComponents.Sum(c => c.Weight);
-            if (Math.Abs(weightSum - 1.0) > 1e-6)
-                throw new ArgumentException(
-                    $"Basket weights must sum to 1. Got {weightSum:F6}.");
+            if (!ProductType.IsMultiAsset())
+                throw new ArgumentException("ProductType must be a multi-asset option.");
+            if (Components.Count < 2)
+                throw new ArgumentException("A multi-asset instrument must have at least 2 components.");
+            
+            if (ProductType == ProductType.BasketCall || ProductType == ProductType.BasketPut)
+            {
+                double weightSum = Components.Sum(c => c.Weight);
+                if (Math.Abs(weightSum - 1.0) > 1e-6)
+                    throw new ArgumentException($"Basket weights must sum to 1. Got {weightSum:F6}.");
+            }
         }
 
         public override string ToString()
             => $"{Ticker} | {ProductType} | Strike: {Strike} | " +
-               $"Components: {BasketComponents.Count} | Maturity: {Maturity:yyyy-MM-dd} | " +
+               $"Components: {Components.Count} | Maturity: {Maturity:yyyy-MM-dd} | " +
                $"Domestic: {DomesticCurrency} | Id: {Id}";
     }
 
     /// <summary>
-    /// Composant d'un panier : un actif avec son poids et sa devise naturelle.
+    /// Component of a multi-assets instrument.
     /// </summary>
-    /// <param name="Underlying">Actif (nom + devise naturelle de cotation).</param>
-    /// <param name="Weight">Poids dans le panier (somme des poids = 1).</param>
-    public record BasketComponent(
+    public record AssetComponent(
         Underlying Underlying,
         double Weight);
 }

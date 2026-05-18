@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TradingDashboard.Core.Enums;
@@ -21,7 +21,7 @@ namespace TradingDashboard.Core.Entities
             AcknowledgedAt = DateTimeOffset.Now;
         }
 
-        //Factory Methode
+        // Factory Method
         public static Alert Create(AlertLevel level, string message , Guid positionId) => new Alert{Level = level, Message = message, PositionId = positionId};
 
     }

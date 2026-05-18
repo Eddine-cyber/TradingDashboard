@@ -3,30 +3,30 @@ using TradingDashboard.Core.Enums;
 namespace TradingDashboard.Core.Entities.Schedule
 {
     /// <summary>
-    /// Calendrier de fixings pour les produits multi-flux (asian, cliquets, accumulateurs…).
-    /// Regroupe les dates d'observation du sous-jacent (fixings) et les dates de paiement.
+    /// Fixing schedule for multi-flow products (e.g., Asian options, cliquets).
+    /// Aggregates the underlying asset observation dates (fixings) and the corresponding payment dates.
     ///
-    /// Convention :
-    ///   - Les FixingDates sont les dates où le spot est observé / fixé.
-    ///   - Les PaymentDates sont les dates où le flux de paiement est versé.
-    ///   - Pour un produit simple (un seul fixing = une seule maturité),
-    ///     FixingDates = { Maturity } et PaymentDates = { Maturity }.
+    /// Convention:
+    ///   - FixingDates: Dates on which the underlying spot is observed or fixed.
+    ///   - PaymentDates: Dates on which the cash flow is settled.
+    ///   - For single-flow products (one fixing, one payment at maturity):
+    ///     FixingDates = { Maturity } and PaymentDates = { Maturity }.
     /// </summary>
     public record FixingSchedule
     {
-        /// <summary>Dates d'observation du sous-jacent, triées chronologiquement.</summary>
+        /// <summary>Chronologically ordered dates for underlying asset observation.</summary>
         public IReadOnlyList<DateOnly> FixingDates { get; init; }
 
         /// <summary>
-        /// Dates de paiement associées. Doit avoir le même nombre d'éléments que FixingDates
-        /// (relation 1-1 fixing → paiement) ou être vide si les paiements sont à maturité.
+        /// Associated payment dates. Must match the length of FixingDates (1-to-1 relationship),
+        /// or can be empty if all payments are deferred to maturity.
         /// </summary>
         public IReadOnlyList<DateOnly> PaymentDates { get; init; }
 
-        /// <summary>Convention de comptage de jours pour le calcul des fractions d'année.</summary>
+        /// <summary>Day count convention used for calculating year fractions.</summary>
         public DayCountConvention DayCount { get; init; }
 
-        /// <summary>Nombre de fixings.</summary>
+        /// <summary>Total number of scheduled fixings.</summary>
         public int Count => FixingDates.Count;
 
         public FixingSchedule(
@@ -37,20 +37,20 @@ namespace TradingDashboard.Core.Entities.Schedule
             if (fixingDates.Count == 0)
                 throw new ArgumentException("FixingSchedule must have at least one fixing date.");
 
-            // Vérification ordre chronologique
+            // Enforce chronological order
             for (int i = 1; i < fixingDates.Count; i++)
                 if (fixingDates[i] <= fixingDates[i - 1])
                     throw new ArgumentException(
                         $"FixingDates must be strictly increasing. Violation at index {i}.");
 
             FixingDates = fixingDates;
-            PaymentDates = paymentDates ?? fixingDates; // même date si non précisé
+            PaymentDates = paymentDates ?? fixingDates; // default to fixing dates if omitted
             DayCount = dayCount;
         }
 
         /// <summary>
-        /// Fractions d'année (yearfracs) depuis une date de référence vers chaque fixing.
-        /// Utile pour le simulateur MC pour déterminer les indices de path.
+        /// Computes the year fractions from a given reference date to each fixing date.
+        /// Used by the Monte Carlo simulator to determine path indices.
         /// </summary>
         public IReadOnlyList<double> GetYearFractions(DateOnly referenceDate)
         {
@@ -67,18 +67,18 @@ namespace TradingDashboard.Core.Entities.Schedule
         }
 
         /// <summary>
-        /// Construit un schedule simple (un seul fixing à maturité).
-        /// Compatible avec les instruments mono-flux existants.
+        /// Constructs a simple schedule consisting of a single fixing at maturity.
+        /// Designed for compatibility with existing single-flow instruments.
         /// </summary>
         public static FixingSchedule Single(DateOnly maturity)
             => new FixingSchedule(new[] { maturity });
 
         /// <summary>
-        /// Construit un schedule d'observations régulières entre start et end.
+        /// Constructs a schedule with evenly distributed observation dates between the start and end dates.
         /// </summary>
-        /// <param name="start">Date de début (exclue).</param>
-        /// <param name="end">Date de fin / maturité (incluse).</param>
-        /// <param name="count">Nombre d'observations.</param>
+        /// <param name="start">The start date (exclusive).</param>
+        /// <param name="end">The end date/maturity (inclusive).</param>
+        /// <param name="count">The total number of observations.</param>
         public static FixingSchedule Uniform(DateOnly start, DateOnly end, int count)
         {
             if (count <= 0) throw new ArgumentException("count must be positive.");
@@ -91,10 +91,10 @@ namespace TradingDashboard.Core.Entities.Schedule
         }
     }
 
-    /// <summary>Convention de comptage de jours pour les fractions d'année.</summary>
+    /// <summary>Day count convention for year fraction calculation.</summary>
     public enum DayCountConvention
     {
-        Act252,   // jours de trading — convention utilisée dans le système existant
+        Act252,   // trading days - convention used in the existing system
         Act365,
         Act360
     }

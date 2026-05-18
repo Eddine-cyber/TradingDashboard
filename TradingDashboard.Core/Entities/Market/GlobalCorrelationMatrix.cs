@@ -1,137 +1,159 @@
+using System;
 using TradingDashboard.Core.Enums;
+using TradingDashboard.Core.Exceptions;
 
 namespace TradingDashboard.Core.Entities.Market
 {
     /// <summary>
-    /// Identifiant unique d'un facteur de risque dans le vecteur de simulation.
-    /// Permet de construire l'ordre strict des facteurs dans la matrice de corrélation.
+    /// Global correlation matrix encompassing all risk factors.
     ///
-    /// Ordre de construction du vecteur de facteurs :
-    ///   1. Actifs equity domestiques  : (AssetClass.Equity, DomesticCurrency, underlyingName)
-    ///   2. Actifs equity étrangers    : (AssetClass.Equity, foreignCurrency_i, underlyingName)
-    ///      par devise i puis par actif ℓ au sein de la devise
-    ///   3. FX pour chaque devise i    : (AssetClass.FX, foreignCurrency_i, null)
+    /// Factor Ordering Convention:
+    ///   [ Domestic Assets | Foreign Assets grouped by currency | FX Rates grouped by currency ]
     ///
-    /// Cet ordre est celui que MonteCarloMultiAssetSimulator respectera.
-    /// </summary>
-    /// <param name="AssetClass">Type de facteur : Equity, FX ou Rate.</param>
-    /// <param name="Currency">Devise associée au facteur.</param>
-    /// <param name="UnderlyingName">
-    ///     Nom de l'actif pour les equity (ex : "AAPL").
-    ///     Null pour les facteurs FX (le nom de la paire est implicite).
-    /// </param>
-    public record RiskFactorKey(
-        AssetClass AssetClass,
-        Currency Currency,
-        string? UnderlyingName);
-
-    /// <summary>
-    /// Matrice de corrélation globale entre tous les facteurs de risque
-    /// du marché multi-devises : equity domestiques, equity étrangers, FX.
-    ///
-    /// Architecture mathématique :
-    ///   Le vecteur de Browniens est (W_S0,1,...,W_S0,L0, W_S1,1,...,W_SN,LN, W_X1,...,W_XN).
-    ///   dim = Σ L_i + N   où L_i = nb actifs dans devise i, N = nb devises étrangères.
-    ///
-    /// La matrice doit être définie positive (toutes valeurs propres > 0).
-    /// La factorisation de Cholesky est utilisée par le simulateur MC.
+    /// The Cholesky decomposition L (where L * L^T = Rho) is pre-computed during construction.
+    /// If the matrix is not positive definite, an InvalidCorrelationMatrixException is thrown immediately.
     /// </summary>
     public record GlobalCorrelationMatrix
     {
-        /// <summary>Mapping ordonné facteur → index colonne/ligne dans la matrice.</summary>
-        public IReadOnlyList<RiskFactorKey> FactorIndex { get; init; }
+        /// <summary>The NxN correlation matrix.</summary>
+        public double[,] Rho { get; }
 
         /// <summary>
-        /// Matrice de corrélation N×N (N = nombre de facteurs).
-        /// Stockée ligne par ligne : Matrix[i][j] = ρ(facteur i, facteur j).
-        /// Doit être symétrique avec des 1 sur la diagonale.
+        /// Ordered mapping where index 'i' corresponds to a specific Underlying risk factor.
         /// </summary>
-        public double[][] Matrix { get; init; }
+        public Underlying[] AssetMapping { get; }
 
-        /// <summary>
-        /// Dimension de la matrice (nombre de facteurs de risque).
-        /// </summary>
-        public int Dimension => FactorIndex.Count;
+        /// <summary>The pre-computed Cholesky factor L such that L * L^T = Rho.</summary>
+        public double[,] CholeskyFactor { get; }
 
-        public GlobalCorrelationMatrix(IReadOnlyList<RiskFactorKey> factorIndex, double[][] matrix)
+        public int Dimension => AssetMapping.Length;
+
+        public GlobalCorrelationMatrix(Underlying[] assetMapping, double[,] rho)
         {
-            if (factorIndex.Count != matrix.Length)
-                throw new ArgumentException(
-                    $"FactorIndex count ({factorIndex.Count}) must match matrix dimension ({matrix.Length}).");
+            AssetMapping = assetMapping ?? throw new ArgumentNullException(nameof(assetMapping));
+            Rho          = rho          ?? throw new ArgumentNullException(nameof(rho));
 
-            for (int i = 0; i < matrix.Length; i++)
-            {
-                if (matrix[i].Length != matrix.Length)
-                    throw new ArgumentException(
-                        $"Matrix row {i} has {matrix[i].Length} elements, expected {matrix.Length}.");
-            }
+            if (rho.GetLength(0) != assetMapping.Length || rho.GetLength(1) != assetMapping.Length)
+                throw new ArgumentException("Correlation matrix dimensions must match the number of assets.");
 
-            FactorIndex = factorIndex;
-            Matrix = matrix;
+            Validate();
+
+            CholeskyFactor = ComputeCholesky()
+                ?? throw new InvalidCorrelationMatrixException("The correlation matrix is not positive definite.");
         }
 
-        /// <summary>
-        /// Retourne l'index (ligne/colonne) d'un facteur dans la matrice.
-        /// Lève ArgumentException si le facteur n'est pas trouvé.
-        /// </summary>
-        public int IndexOf(RiskFactorKey key)
-        {
-            for (int i = 0; i < FactorIndex.Count; i++)
-                if (FactorIndex[i] == key) return i;
+        // -------------------------------------------------------------------------
+        // Validation
+        // -------------------------------------------------------------------------
 
-            throw new ArgumentException(
-                $"RiskFactor {key} not found in GlobalCorrelationMatrix.");
-        }
-
-        /// <summary>
-        /// Corrélation entre deux facteurs identifiés par leurs clés.
-        /// </summary>
-        public double GetCorrelation(RiskFactorKey a, RiskFactorKey b)
-            => Matrix[IndexOf(a)][IndexOf(b)];
-
-        /// <summary>
-        /// Construit une matrice d'identité (tous facteurs indépendants).
-        /// Utile pour les tests et comme valeur par défaut.
-        /// </summary>
-        public static GlobalCorrelationMatrix Identity(IReadOnlyList<RiskFactorKey> factors)
-        {
-            int n = factors.Count;
-            double[][] m = new double[n][];
-            for (int i = 0; i < n; i++)
-            {
-                m[i] = new double[n];
-                m[i][i] = 1.0;
-            }
-            return new GlobalCorrelationMatrix(factors, m);
-        }
-
-        /// <summary>
-        /// Factorisation de Cholesky : L tel que L * L^T = Matrice.
-        /// Retourne null si la matrice n'est pas définie positive.
-        /// Utilisée par les simulateurs MC pour la génération de Browniens corrélés.
-        /// </summary>
-        public double[][]? CholeskyDecomposition()
+        public void Validate()
         {
             int n = Dimension;
-            double[][] L = new double[n][];
-            for (int i = 0; i < n; i++) L[i] = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                if (Math.Abs(Rho[i, i] - 1.0) > 1e-9)
+                    throw new InvalidCorrelationMatrixException($"Diagonal element at ({i},{i}) is not 1.");
+
+                for (int j = 0; j < n; j++)
+                {
+                    if (Math.Abs(Rho[i, j] - Rho[j, i]) > 1e-9)
+                        throw new InvalidCorrelationMatrixException($"Matrix is not symmetric at ({i},{j}).");
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // Lookup
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Returns the index of the risk factor identified by its ticker.
+        /// For FX assets, the ticker is the foreign currency code (e.g., "USD").
+        /// </summary>
+        public int IndexOf(string ticker)
+        {
+            for (int i = 0; i < AssetMapping.Length; i++)
+            {
+                if (AssetMapping[i].Name == ticker)
+                    return i;
+            }
+            throw new ArgumentException($"Underlying with ticker '{ticker}' not found in correlation matrix.");
+        }
+
+        /// <summary>Overload to specify the AssetClass in case multiple assets share the same ticker.</summary>
+        public int IndexOf(string ticker, AssetClass assetClass)
+        {
+            for (int i = 0; i < AssetMapping.Length; i++)
+            {
+                if (AssetMapping[i].Name == ticker && AssetMapping[i].AssetClass == assetClass)
+                    return i;
+            }
+            throw new ArgumentException($"Underlying '{ticker}' with class {assetClass} not found.");
+        }
+
+        // -------------------------------------------------------------------------
+        // Sous-matrice
+        // -------------------------------------------------------------------------
+
+        /// <summary>
+        /// Extracts a sub-correlation matrix for a specific subset of risk factors.
+        /// Used by MarketEnvironment.Extract() and PortfolioPricer for optimization.
+        /// </summary>
+        public GlobalCorrelationMatrix Sub(int[] indices)
+        {
+            int newN = indices.Length;
+            var subMapping = new Underlying[newN];
+            var subRho     = new double[newN, newN];
+
+            for (int i = 0; i < newN; i++)
+            {
+                subMapping[i] = AssetMapping[indices[i]];
+                for (int j = 0; j < newN; j++)
+                    subRho[i, j] = Rho[indices[i], indices[j]];
+            }
+
+            return new GlobalCorrelationMatrix(subMapping, subRho);
+        }
+
+        // -------------------------------------------------------------------------
+        // Factories
+        // -------------------------------------------------------------------------
+
+        /// <summary>Creates a 1x1 identity matrix for a single asset (used for backward compatibility).</summary>
+        public static GlobalCorrelationMatrix Identity(Underlying[] assets)
+        {
+            int n = assets.Length;
+            double[,] m = new double[n, n];
+            for (int i = 0; i < n; i++)
+                m[i, i] = 1.0;
+            return new GlobalCorrelationMatrix(assets, m);
+        }
+
+        // -------------------------------------------------------------------------
+        // Cholesky privé
+        // -------------------------------------------------------------------------
+
+        private double[,]? ComputeCholesky()
+        {
+            int n = Dimension;
+            double[,] L = new double[n, n];
 
             for (int i = 0; i < n; i++)
             {
                 for (int j = 0; j <= i; j++)
                 {
-                    double sum = Matrix[i][j];
+                    double sum = Rho[i, j];
                     for (int k = 0; k < j; k++)
-                        sum -= L[i][k] * L[j][k];
+                        sum -= L[i, k] * L[j, k];
 
                     if (i == j)
                     {
-                        if (sum <= 0) return null; // matrice non définie positive
-                        L[i][j] = Math.Sqrt(sum);
+                        if (sum <= 1e-12) return null;
+                        L[i, j] = Math.Sqrt(sum);
                     }
                     else
                     {
-                        L[i][j] = sum / L[j][j];
+                        L[i, j] = sum / L[j, j];
                     }
                 }
             }

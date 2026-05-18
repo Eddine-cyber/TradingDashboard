@@ -1,70 +1,49 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
+using System;
 
 namespace TradingDashboard.Core.Entities
 {
+    /// <summary>
+    /// Greeks of a financial instrument.
+    /// Support addition and multiplication by a scalar.
+    /// </summary>
     public struct Greeks
     {
-        private double _delta;
-        private double _gamma;
-        private double _vega;
-        private double _theta;
-        private double _rho;
-        private DateTimeOffset _calculatedAt;
+        public double Delta       { get; set; }
+        public double Gamma       { get; set; }
+        public double Vega        { get; set; }
+        public double Theta       { get; set; }
+        public double Rho         { get; set; }
+        public DateTimeOffset CalculatedAt { get; set; }
 
-        public Greeks(double delta, double gamma, double vega, double rho, double theta, DateTimeOffset calculatedAt)
+        public Greeks(double delta, double gamma, double vega, double theta, double rho, DateTimeOffset calculatedAt)
         {
-            Delta = delta;
-            Gamma = gamma;
-            Vega = vega;
-            Theta = theta;
-            Rho = rho;
-            Theta = theta;
+            Delta       = delta;
+            Gamma       = gamma;
+            Vega        = vega;
+            Theta       = theta;
+            Rho         = rho;
             CalculatedAt = calculatedAt;
         }
-        public double Delta { get; set; }
-        public double Gamma { get; set; }
-        public double Vega { get; set; }
-        public double Theta { get; set; }
-        public double Rho { get; set; }
-        public DateTimeOffset CalculatedAt { get; set; }
-        public bool IsValide()
-        {
-            return true;
-        }
 
-        public static Greeks operator + (Greeks first, Greeks second)
-        {
+        public static Greeks Zero() => new Greeks(0, 0, 0, 0, 0, DateTimeOffset.UtcNow);
 
-            first.Delta += second.Delta; 
-            first.Gamma += second.Gamma;
-            first.Vega += second.Vega;
-            first.Theta += second.Theta;
-            first.Rho += second.Rho;
-            first.CalculatedAt = DateTimeOffset.UtcNow;
+        public static Greeks operator +(Greeks a, Greeks b) => new Greeks(
+            a.Delta + b.Delta,
+            a.Gamma + b.Gamma,
+            a.Vega  + b.Vega,
+            a.Theta + b.Theta,
+            a.Rho   + b.Rho,
+            DateTimeOffset.UtcNow);
 
-            return first;
-        }
-        public static Greeks operator *(int quantity, Greeks greeks)
-        {
+        public static Greeks operator *(int quantity, Greeks g) => new Greeks(
+            quantity * g.Delta,
+            quantity * g.Gamma,
+            quantity * g.Vega,
+            quantity * g.Theta,
+            quantity * g.Rho,
+            DateTimeOffset.UtcNow);
 
-            greeks.Delta *= quantity;
-            greeks.Gamma *= quantity;
-            greeks.Vega *= quantity;
-            greeks.Theta *= quantity;
-            greeks.Rho *= quantity;
-            greeks.CalculatedAt = DateTimeOffset.UtcNow;
-
-            return greeks;
-        }
-
-        public static Greeks Zero()
-        {
-            Greeks res = new();
-            res.CalculatedAt = DateTime.Now;
-            return res;
-        }
+        public override string ToString()
+            => $"Δ={Delta:F4} Γ={Gamma:F4} ν={Vega:F4} Θ={Theta:F4} ρ={Rho:F4} @ {CalculatedAt:HH:mm:ss}";
     }
 }

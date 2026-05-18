@@ -1,74 +1,78 @@
+using System;
+using System.Collections.Generic;
 using TradingDashboard.Core.Enums;
 
 namespace TradingDashboard.Core.Entities.Instruments
 {
     /// <summary>
-    /// Option sur taux de change (FX option).
-    /// Modèle de Garman-Kohlhagen — équivalent Black-Scholes avec deux taux sans risque.
+    /// European FX option priced with the Garman-Kohlhagen model.
     ///
-    /// Exemples :
-    ///   EUR call / USD put → droit d'acheter 1 EUR contre K USD à maturité.
-    ///   Underlying = paire FX (ex : EURUSD).
+    /// STATIC CONTRACT DATA:
+    ///   - Strike     : exercise price in EUR (domestic currency)
+    ///   - Underlying : FX rate identifier (e.g. Underlying("USD", EUR, FX))
     ///
-    /// Dynamique sous mesure risque-neutre domestique (currency d) :
-    ///   dX_t = X_t * (r_d - r_f) dt + σ_X dW_t
-    ///
-    /// Non-régression :
-    ///   Hérite de Instrument. NaturalCurrency de Underlying = devise étrangère (base).
-    ///   DomesticCurrency = devise de règlement (quote).
+    /// MARKET DATA (stored in MarketEnvironment, not here):
+    ///   - FX spot     → MarketEnvironment.Snapshots["USD"].SpotPrice
+    ///   - FX vol      → MarketEnvironment.Snapshots["USD"].ImpliedVolatility
+    ///   - Foreign rate → MarketEnvironment.ForeignRates[Currency.USD]
     /// </summary>
     public record FxOptionInstrument(
         Guid Id,
         string Ticker,
-        Underlying Underlying,           // FX pair — NaturalCurrency = devise étrangère (base)
         DateOnly Maturity,
-        Currency DomesticCurrency,       // devise de règlement (quote currency)
-        double Strike,                   // K : nombre d'unités de devise domestique par unité étrangère
+        Currency DomesticCurrency,
         ProductType ProductType,
-        double ForeignRiskFreeRate,      // r_f : taux sans risque de la devise étrangère
-        double FxVolatility)             // σ_X : volatilité du taux de change
-        : Instrument(Id, Ticker, Underlying, Maturity, DomesticCurrency, ProductType)
+        double Strike,
+        Underlying Underlying)
+        : Instrument(Id, Ticker, Maturity, DomesticCurrency, ProductType)
     {
-        /// <summary>Devise étrangère (base) = NaturalCurrency du Underlying FX.</summary>
+        /// <summary>Foreign currency of the option, taken from the FX underlying.</summary>
         public Currency ForeignCurrency => Underlying.NaturalCurrency;
+
+        public override double? StrikeOrNull => Strike;
+
+        public override IEnumerable<string> GetTickers()
+        {
+            yield return Underlying.Name;
+        }
 
         public static FxOptionInstrument Create(
             string ticker,
-            string fxPairName,
+            string fxTicker,
             Currency foreignCurrency,
             DateOnly maturity,
             Currency domesticCurrency,
-            double strike,
             ProductType productType,
-            double foreignRiskFreeRate,
-            double fxVolatility,
+            double strike,
             Guid id = default)
         {
-            var underlying = new Underlying(fxPairName, foreignCurrency);
+            // The FX rate is an Underlying of asset class FX
+            var fxUnderlying = new Underlying(fxTicker, foreignCurrency, AssetClass.FX);
             var inst = new FxOptionInstrument(
                 id == Guid.Empty ? Guid.NewGuid() : id,
-                ticker, underlying, maturity, domesticCurrency,
-                strike, productType, foreignRiskFreeRate, fxVolatility);
+                ticker, maturity, domesticCurrency,
+                productType, strike, fxUnderlying);
             inst.Validate();
             return inst;
         }
 
         public override void Validate()
         {
-            if (ProductType != ProductType.FxCall && ProductType != ProductType.FxPut)
-                throw new ArgumentException("ProductType must be FxCall or FxPut.");
+            if (ProductType != ProductType.FxCall && ProductType != ProductType.FxPut
+                && ProductType != ProductType.FxAsianCall && ProductType != ProductType.FxAsianPut
+                && ProductType != ProductType.FxBarrierCall && ProductType != ProductType.FxBarrierPut)
+                throw new ArgumentException("ProductType must be an FX option type.");
             if (Strike <= 0)
                 throw new ArgumentException("FX option Strike must be strictly positive.");
-            if (FxVolatility < 0)
-                throw new ArgumentException("FxVolatility cannot be negative.");
             if (ForeignCurrency == DomesticCurrency)
                 throw new ArgumentException(
                     $"ForeignCurrency ({ForeignCurrency}) and DomesticCurrency ({DomesticCurrency}) must differ.");
+            if (Underlying.AssetClass != AssetClass.FX)
+                throw new ArgumentException("FxOptionInstrument Underlying must have AssetClass.FX.");
         }
 
         public override string ToString()
             => $"{Ticker} | {ProductType} | Strike: {Strike} | " +
-               $"FX: {ForeignCurrency}/{DomesticCurrency} | σ_X: {FxVolatility:P2} | " +
-               $"r_f: {ForeignRiskFreeRate:P2} | Maturity: {Maturity:yyyy-MM-dd} | Id: {Id}";
+               $"FX: {ForeignCurrency}/{DomesticCurrency} | Maturity: {Maturity:yyyy-MM-dd} | Id: {Id}";
     }
 }
